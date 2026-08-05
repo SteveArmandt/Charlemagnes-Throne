@@ -2860,16 +2860,25 @@ async function trialByCombat(challenger, holder){
 
   const challengerWins = cCard>=hCard;              // ties go to the Challenger
   log(`${fmtP(challenger)} lays <b>${cCard}</b>, ${fmtP(holder)} lays <b>${hCard}</b> \u2014 `+
-      `${challengerWins?fmtP(challenger):fmtP(holder)} takes the arrow`+
+      `${challengerWins? fmtP(challenger)+' takes the arrow' : fmtP(holder)+' keeps the arrow'}`+
       `${cCard===hCard?' on the Challenger\u2019s tie':''}.`, 'heir');
 
   if(challenger.isHuman || holder.isHuman){
     const me = challenger.isHuman ? challenger : holder;
-    const won = challengerWins===(me===challenger);
+    const iChallenged = me===challenger;
+    const won = challengerWins===iChallenged;
+    /* Say where the arrow actually ended up. All four cases differ: winning as
+       Challenger takes it, winning as holder keeps it, losing as Challenger
+       leaves it, and losing as holder hands it over. */
+    const outcome = iChallenged
+      ? (won ? 'The arrow passes to you.'
+             : `The arrow stays with ${holder.name}.`)
+      : (won ? 'You keep the arrow.'
+             : `The arrow passes to ${challenger.name}.`);
     await notice(won? 'You win the trial' : 'You lose the trial',
       `${fmtP(challenger)} laid <b>${cCard}</b>. ${fmtP(holder)} laid <b>${hCard}</b>.<br><br>`+
       (cCard===hCard? 'A tie \u2014 and a tie goes to the Challenger. ' : '')+
-      (won? 'The arrow is yours.' : 'The arrow stays where it is.'));
+      outcome);
   }
   // only now may an emptied hand be recovered
   [challenger, holder].forEach(pl=>{
