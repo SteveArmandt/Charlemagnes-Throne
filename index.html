@@ -346,9 +346,6 @@ canvas{display:block;}
   padding:5px 9px; border-radius:3px;}
 #setup h2{font-family:var(--disp); font-weight:700; font-size:21px; letter-spacing:.09em;}
 #setup .lede{color:var(--ink2); font-size:14.5px; line-height:1.5; margin:9px 0 4px;}
-#coupshow{font-family:var(--disp); font-size:13px; letter-spacing:.06em; color:var(--ink);
-  margin-top:12px; padding:9px; border-top:1px solid #cbb98c; border-bottom:1px solid #cbb98c;}
-#coupshow b{color:var(--danger);}
 
 /* roll call */
 #rollrows{margin:14px 0 4px; text-align:left;}
@@ -401,6 +398,21 @@ canvas{display:block;}
 #dock .col{display:flex; flex-direction:column; align-items:center; gap:4px;}
 #dockleft{display:flex; flex-direction:column; gap:6px; flex:0 0 380px; min-width:0;}
 #dtop{display:flex; align-items:flex-end; gap:7px; height:44px;}
+  /* Your muster, beside the Emissaries: one pip per Noble. Filled = in hand and
+     ready to seat, hollow = already on the board, barred = held hostage. */
+  #muster{display:flex; flex-direction:column; align-items:center; gap:2px; padding:0 2px 1px;
+    flex:none; align-self:flex-end;}
+  #musterpips{display:grid; grid-template-columns:repeat(3,7px); gap:3px;}
+  #musterpips i{width:7px; height:7px; border-radius:50%; border:1px solid #8a7448; display:block;
+    background:#e9dcbe; box-shadow:0 0 0 1px rgba(0,0,0,.28) inset;}
+  #musterpips i.out{background:transparent; opacity:.5;}
+  #musterpips i.held{background:transparent; opacity:.85; border-color:#a8842f; position:relative;}
+  #musterpips i.held::after{content:''; position:absolute; left:-1px; top:2px; width:7px; height:1px;
+    background:#a8842f; transform:rotate(-45deg);}
+  #muster .mlabel{font-family:var(--disp); font-size:7.5px; letter-spacing:.1em; color:var(--ink2);
+    text-transform:uppercase; line-height:1;}
+  #muster.low #musterpips i:not(.out):not(.held){background:#d9b454;}
+  #muster.empty .mlabel{color:var(--danger);}
 #dtop .eyebrow{font-size:9px; letter-spacing:.16em; padding-bottom:2px; margin-left:auto;}
 
 /* faction + status: the same cards, half as tall, sitting over the Honor row */
@@ -655,39 +667,34 @@ canvas{display:block;}
     <div class="hr"></div>
     <div class="rules">
       <b>OBJECTIVE</b>
-      <span id="objtext">Move up the 4 paths of the kingdom and seat Nobles in your own colour behind the faction you secretly back. When a quorum of support is reached, you may Call for the Throne for your faction. The highest Status among their supporters becomes the Heir’s Paladin, winning the game.</span>
+      <span id="objtext">Move up the 4 paths of the kingdom and gain support for the faction you secretly back. When a quorum of support is reached, you may Call for the Throne for your faction. The highest Status among their supporters becomes the Heir’s Paladin, winning the game.</span>
       <b>WHAT YOU KNOW</b>
       You know which faction you back. Your own Status card faces away from you — every rival can read it, and you cannot.
+      <b>YOUR NOBLES</b>
+      You muster <b class="inl">6 Nobles</b> for the whole game and never gain or lose any. Every Noble you seat comes out of that six,
+      and any removed from the board return to your reserve to be seated again.<span class="expo"> A <i>Captured</i> Noble is the exception
+      — held out of play until a <i>Rescue</i> brings them home.</span>
       <b>A TURN</b>
-      On your turn, discard one Honor card and split the movement points however you&rsquo;d like between your two Emissaries. Move up the paths toward the centre.<br><br><b class="inl">1</b> moves one and also earns an Intrigue card. <b class="inl">2</b> may be played for movement OR exile a rival&rsquo;s Noble to another faction. <b class="inl">3</b> may be played for movement OR removing a rival&rsquo;s Noble from the board. <b class="inl">4&ndash;6</b> are played for movement only.<br><br>When you have discarded all 6 cards, take them back into your hand. You may also skip a turn and collect discards on any turn.
+      On your turn, discard one Honor card and split the movement points however you&rsquo;d like between your two Emissaries. Move up the paths toward the centre.<br><br><span id="turnpow"></span><br><br>When you have discarded all 6 cards, take them back into your hand. You may also skip a turn and collect discards on any turn.
       <b id="pathhead">THE THREE PATHS</b>
-      An Emissary that reaches the centre seats a Noble <i>in your colour</i> with a faction of your choosing, then takes that path's action — Army moves allegiance, Church moves Status, and Market lets you move Nobles.<span class="expo"><br><br>Each Noble placed with a particular faction will add to your Status if that faction Calls for the Throne (see below).</span>
+      An Emissary that reaches the centre must seat a Noble <i>in your colour</i> from your reserve if able, then takes that path's action.
+      <b class="inl">You do not choose where the Noble goes</b> &mdash; flip the top Faction card, seat the Noble there, shuffle.
+      Church moves Status, Market moves Nobles, and Army moves allegiance &mdash; or, on Army alone, you may <i>Command</i> the placement
+      and seat the Noble anywhere you like instead of taking an Army action.<span class="expo"><br><br>Each Noble placed with a particular faction will add to your Status if that faction Calls for the Throne (see below).</span>
       <b class="expo">THE FOURTH PATH</b><span class="expo">
-      The Heir’s Paladin is two steps longer. Completing it seats a Noble exactly as the other paths do, and then turns the arrow to you: <i>+1 Status, you stand in every Call regardless of faction, and you win every tie.</i> It grants no path action and you cannot Call from it.</span>
+      The Heir’s Paladin is two steps longer. Completing it seats a Noble exactly as the other paths do, and then turns the arrow to you: <i>+1 Status, you stand in every Call regardless of faction, and you win every tie.</i> If another player already holds the arrow you become the <i>Challenger</i>: each of you secretly chooses one unspent Honor card and reveals simultaneously. The higher card takes or retains the arrow, and the Challenger wins ties. Both cards are discarded without providing movement or using their printed abilities. It grants no path action and you cannot Call from it.</span>
       <b>THE CALL FOR THE THRONE</b>
-      A player who completes a path and creates a quorum of Nobles (a total of at least 5) for a faction may <i>Call for the Throne</i> for that faction. Players may play Intrigue cards to stop it. If the <i>Call</i> resolves, the player with the highest Status in that faction (Heir’s Paladin included) wins the game.
+      A faction reaches <b class="inl">quorum</b> at <b class="inl">5</b> Nobles. After completing Church, Market or Army you may
+      <i>Call for the Throne</i> for a faction at quorum <b class="inl">in which you stand</b>, instead of taking that path's action.
+      You stand with the faction you currently support.<span class="expo"> The player holding the arrow stands in every faction,
+      and may therefore Call for any of them.</span>
+      <br><br>Each rival in turn may answer with an Intrigue. If the faction is knocked below 5 before the answers run out,
+      the <b class="inl">Call fails</b> and play goes on &mdash; and you have spent your action for nothing. If it holds, everyone reveals:
+      the highest Status among that faction's supporters<span class="expo">, the Heir&rsquo;s Paladin included,</span> wins the game. On a tie,<span class="expo"> the Paladin takes it; failing that,</span> the higher printed Status card wins.
+      <br><br>The instant any faction reaches <b class="inl">7</b>, a Call goes up for it at once, whoever seated the Noble.
     </div>
   </div>
 
-  <div class="panel" id="s2" style="display:none"><div class="ornament"></div>
-    <h2>SET THE COURT</h2>
-    <p class="lede">How many Nobles must gather behind one faction before anyone may Call for the Throne?</p>
-    <div class="eyebrow" style="margin-top:14px">Quorum</div>
-    <div class="optrow" id="qcount">
-      <button class="btn" data-q="5" aria-pressed="true">5</button>
-      <button class="btn" data-q="6">6</button>
-      <button class="btn" data-q="7">7</button>
-      <button class="btn" data-q="8">8</button>
-      <button class="btn" data-q="9">9</button>
-      <button class="btn" data-q="10">10</button>
-    </div>
-    <div id="coupshow"></div>
-    <p class="lede" style="font-size:13px">A low quorum makes for a short, sharp game — factions reach the coup count almost as soon as they reach quorum. A high quorum gives the court room to manoeuvre.</p>
-    <div style="margin-top:14px; display:flex; gap:9px; justify-content:center">
-      <button class="btn ghost" id="backto1">Back</button>
-      <button class="btn gold" id="toroll" style="padding:11px 24px">Deal the cards</button>
-    </div>
-  </div>
 
   <div class="panel" id="s3" style="display:none"><div class="ornament"></div>
     <h2>THE COURT ASSEMBLES</h2>
@@ -722,6 +729,7 @@ canvas{display:block;}
       <div class="bigcard faction" id="myfaction"></div>
       <div class="bigcard back" id="mystatus">?</div>
       <div id="emisdock"></div>
+      <div id="muster" title="Your Nobles"><div id="musterpips"></div><span class="mlabel">Nobles</span></div>
       <span class="eyebrow">Honor<span id="movenote"></span></span>
     </div>
     <div id="hand"></div>
@@ -752,6 +760,7 @@ canvas{display:block;}
   <div class="figs"><span>Quorum <b id="qnum">—</b></span><span>Coup <b id="cnum">—</b></span></div>
   <div class="eyebrow" style="margin-top:8px" id="nobhead">Your Nobles</div>
   <div id="mynobles"></div>
+  <div id="capline" class="small" style="margin-top:6px; display:none"></div>
 </div>
 
 <button class="btn" id="legtoggle">Paths</button>
@@ -761,7 +770,7 @@ canvas{display:block;}
     <span class="tname" style="color:var(--charles)">ARMY</span><span class="tsub">allegiance</span><span class="tlen">6</span>
     <div class="legicons">
       <span tabindex="0" data-tip="Swap your faction with a rival — both of you see the new allegiance."><svg><use href="#ic-swap"></use></svg></span>
-      <span tabindex="0" data-tip="Discard your faction and draw a new one."><svg><use href="#ic-draw"></use></svg></span>
+      <span tabindex="0" data-tip="Choose your faction: look through the Faction deck, take the card you want, then shuffle."><svg><use href="#ic-draw"></use></svg></span>
       <span tabindex="0" data-tip="Force a rival to discard and draw a new faction."><svg><use href="#ic-force"></use></svg></span>
       <span tabindex="0" data-tip="Look at a rival's faction."><svg><use href="#ic-eye"></use></svg></span>
     </div>
@@ -769,8 +778,8 @@ canvas{display:block;}
   <div class="legrow">
     <span class="tname" style="color:var(--italy)">MARKET</span><span class="tsub">nobles</span><span class="tlen">6</span>
     <div class="legicons">
-      <span tabindex="0" data-tip="Bribe: buy one Noble across to another faction and take their loyalty with them. The Noble becomes yours."><svg><use href="#ic-swap"></use></svg></span>
-      <span tabindex="0" data-tip="Purge 2 Nobles off the board for good. You choose whose."><svg><use href="#ic-x"></use></svg></span>
+      <span tabindex="0" data-tip="Bribe: Return a rival&rsquo;s seated Noble to their reserve, then seat one Noble from your reserve in another faction. You cannot Bribe if your reserve is empty."><svg><use href="#ic-swap"></use></svg></span>
+      <span tabindex="0" data-tip="Purge 2 Nobles off the board. They return to their owners\u2019 musters."><svg><use href="#ic-x"></use></svg></span>
     </div>
   </div>
   <div class="legrow">
@@ -814,38 +823,72 @@ canvas{display:block;}
   <p class="lede">Put your faction on the throne. Stand highest among those who did.</p>
 
   <h3>OBJECTIVE</h3>
-  <p>Move up the 4 paths of the kingdom and seat Nobles in your own colour behind the faction you secretly back. When a quorum of support is reached, you may Call for the Throne for your faction. At the Call your Status counts, and <b>every Noble of yours seated with that faction adds +1</b>. The highest total among their supporters becomes the Heir’s Paladin, winning the game.</p>
-  <p>You hold one <b>Faction</b> card and only you can read it. You also hold a <b>Status</b> card, 1 to 9, standing face outward — every rival reads it, and you cannot. So you know whose side you are on, but not whether you are worth enough to lead it. Before play you set the <b>quorum</b>; the <b>coup</b> count is always two higher.</p>
+  <p id="rbobj"></p>
+  <p>Each player musters <b>6 Nobles</b> for the whole game and never gains or loses any. Every Noble you seat comes out of that six,
+  and any removed from the board returns to your reserve to be seated again.<span class="expo"> A <b>Captured</b> Noble is the exception:
+  they are held by their captor, out of play and scoring nothing, until a <b>Rescue</b> returns them to your reserve.</span></p>
+  <p>You hold one <b>Faction</b> card and only you can read it. You also hold a <b>Status</b> card, 1 to 9, standing face outward — every rival reads it, and you cannot. So you know whose side you are on, but not whether you are worth enough to lead it.</p>
 
   <h3>YOUR TURN</h3>
   <ul>
     <li>Play one <b>Honor</b> card and spend its points moving your two <b>Emissaries</b> along the paths. An Ace is worth one point and draws you an Intrigue.</li>
-    <li>The low cards carry a favour instead of movement — never both. Spend the <b>2</b> to <b>Exile</b> a Noble, driving them out to another faction, or the <b>3</b> to <b>Raid</b>, taking one off the board for good. An exiled Noble stays whoever’s it was; only the Market can buy their loyalty.</li>
+    <li class="expo">The low cards carry a favour instead of movement — never both. <b>2 — Capture:</b> take a rival’s Noble off the board and hold them hostage. <b>3 — Exile:</b> move a Noble to another faction. <b>4 — Rescue:</b> return a captive Noble. Its captor receives an Intrigue card or advances an Emissary two spaces. The rescued Noble returns to your muster, ready to be seated again.</li>
     <li>Or skip your turn entirely and take all your discards back into hand.</li>
     <li>Play your whole hand and it all returns at once.</li>
     <li>Own-turn Intrigues may be played before or after you move. <b>On March</b> replaces the Honor card altogether and lets you name the amount.</li>
   </ul>
 
   <h3>THE PATHS</h3>
-  <p>Reaching the centre always seats a Noble with a faction of your choosing. You then take that path's action.</p>
+  <p>When you complete a path you <b>must</b> place one Noble from your reserve if able. <b>You do not choose where it goes:</b>
+  flip the top card of the Faction deck, seat the Noble with that faction, then return the card and shuffle. If you have no
+  Nobles available you place none, but you still take the path action.</p>
+  <p><b>The Army is the exception.</b> On completing Army, choose one:</p>
   <ul>
-    <li><span class="pathname" style="color:var(--charles)">ARMY</span> — six steps, allegiance. Swap your faction with a rival, discard and draw a new one, force a rival to draw, or secretly read a rival's card.</li>
+    <li><b>Command</b> &mdash; seat the Noble with any faction you choose. You take <i>no</i> Army action.</li>
+    <li><b>Counsel</b> &mdash; the deck decides where the Noble goes, and you take one Army action.</li>
+  </ul>
+  <ul>
+    <li><span class="pathname" style="color:var(--charles)">ARMY</span> &mdash; six steps, allegiance. Under <b>Counsel</b>:
+    choose your faction (look through the deck, take the card you want, then shuffle), swap Faction cards with a rival, force a
+    rival to discard and redraw blind, or secretly read a rival's card. You may steer only your own allegiance &mdash; a rival can
+    only ever be made to redraw at random.</li>
     <li><span class="pathname" style="color:var(--louis)">CHURCH</span> — six steps, status. Swap your Status with a rival, discard and draw blind, force a rival to draw, or look at your own.</li>
-    <li><span class="pathname" style="color:var(--italy)">MARKET</span> — six steps, nobles. <b>Purge:</b> remove 2 Nobles from the board. <b>Bribe:</b> move a Noble to another faction.<span class="expo"> &#10148; The Noble becomes yours.</span></li>
-    <li class="expo"><span class="pathname" style="color:var(--brass)">THE HEIR’S PALADIN</span> — eight steps, and it pays no action. Completing it turns the brass arrow to you.</li>
+    <li><span class="pathname" style="color:var(--italy)">MARKET</span> — six steps, nobles. <b>Purge:</b> remove 2 Nobles from the board. <b>Bribe:</b> return a rival&rsquo;s seated Noble to their reserve, then seat one Noble from your own reserve with another faction. You cannot Bribe if your reserve is empty.</li>
+    <li class="expo"><span class="pathname" style="color:var(--brass)">THE HEIR’S PALADIN</span> — eight steps, and it pays no path action. Completing it turns the brass arrow to you, or forces a <b>Trial by Combat</b> if another player already holds it.</li>
   </ul>
 
   <h3 class="expo">THE ARROW</h3>
   <p class="expo">While the arrow points at you, you are the Heir's Paladin: your Status counts <b>+1</b>, you stand among the contenders in <b>every</b> Call no matter which faction is named, and you take the crown on <b>any tie</b>.</p>
+  <p class="expo"><b>Trial by Combat.</b> When a player completes The Heir’s Paladin while another player holds the arrow, the completing player becomes the <b>Challenger</b>. The Challenger and current Paladin each secretly choose one unspent Honor card from their hand and reveal simultaneously. The higher card takes or retains the arrow; the Challenger wins ties. Both cards are discarded without providing movement or using their printed abilities.</p>
+  <ul class="expo">
+    <li>No current Paladin: the completing player takes the arrow without a Trial.</li>
+    <li>The current Paladin completes the path: they retain the arrow, and no Trial occurs.</li>
+    <li>A duellist with no cards in hand plays a value of <b>0</b>.</li>
+    <li>If the Challenger completed the path using their final Honor card, the Trial is resolved before they recover their discarded hand.</li>
+    <li>Duel cards do not activate Capture, Exile or Rescue.</li>
+    <li>Neither player may recover cards in the middle of a Trial.</li>
+  </ul>
   <p class="expo">You may not Call for the Throne from that path.</p>
 
   <h3>WINNING</h3>
   <ul>
-    <li>Once <i>your own</i> faction has gathered the <b>quorum</b>, reaching the centre lets you seat a Noble and then <b>Call for the Throne</b> for them, instead of taking that path's action. You may only Call for the faction you back.</li>
-    <li>The instant any faction reaches the <b>coup</b> count, the Call goes up for them at once, whoever seated the Noble.</li>
+    <li>A faction reaches <b>quorum</b> at <b>5</b> seated Nobles. After completing Church, Market or Army you may
+      <b>Call for the Throne</b> for a faction at quorum <b>in which you stand</b>, instead of taking that path's action.
+      The Heir&rsquo;s Paladin path can never make a Call.</li>
+    <li><b>You stand</b> with the faction you currently support.<span class="expo"> The player holding the arrow stands in
+      every faction, and may therefore Call for any faction at quorum.</span> Standing decides both who may Call and who
+      competes once the Call resolves.</li>
+    <li><b>A Call can be broken.</b> Each other player, in turn order, may answer it with an Intrigue. If the faction no longer
+      holds 5 Nobles once the answers are done, the Call <b>fails</b> and the game continues &mdash; the caller has spent their
+      action for nothing.</li>
+    <li>The instant any faction reaches <b>7</b>, a Call goes up for it at once, whoever seated the Noble. That Call may be
+      answered like any other.</li>
+    <li><b>Ties.</b><span class="expo"> The Paladin wins any tie they share. Otherwise</span> the tied contender with the
+      higher <b>printed Status</b> wins &mdash; the card itself, before Nobles<span class="expo"> or the arrow</span> are added.</li>
+
   </ul>
   <p id="winpara"></p>
-  <p class="expo">Whoever holds the arrow counts as standing with the faction named, whichever one it is.</p>
+
 
   <h3>WHAT TO WATCH</h3>
   <p>You can read every Status but your own, and each rival can read yours. Calling for your faction is a wager on a number you have never seen — you may be handing the Paladinate to someone sitting quietly on a 9. You <i>can</i> count your own Nobles, though — that is the part of your score you control, and the part every rival can see coming. Stack them behind one faction and the table learns whose side you are on; a rival who works it out can Purge it in a single action.</p>
@@ -890,19 +933,22 @@ let PATHS = ['Army','Market','Church'];
 let EXPANSION = true;
 const STEPS = {Army:6, Market:6, Church:6, Heir:8};
 const CORE_PATHS = ['Army','Market','Church'];
+const NOBLES_EACH = 6;      // each player musters six Nobles for the whole game
 
 /* The low Honor cards are poor for movement, so they carry a favour instead.
    It is one or the other, never both: spend the card on tempo, or on mischief.
    The Market does the same two things at double strength, and only the Market
    can take a Noble's loyalty as well as their position. */
+function honorPower(v){ return EXPANSION ? HONOR_POWER[v] : null; }
 function powerSub(v){ const h=HONOR_POWER[v]; return (!EXPANSION && h.subBase) ? h.subBase : h.sub; }
 const HONOR_POWER = {
-  2: {act:'exileOne', label:'Exile a Noble',
-      sub:'Drive one Noble out to another faction. They stay their own lord\u2019s. You do not move.',
-      subBase:'Drive one Noble out to another faction. You do not move.'},
-  3: {act:'raidOne', label:'Raid',
-      sub:'Take one Noble off the board for good \u2014 you choose whose. You do not move.',
-      subBase:'Take one Noble off the board for good. You do not move.'},
+  2: {act:'captureOne', label:'Capture', needsRival:true,
+      sub:'Take a rival\u2019s Noble off the board and hold them hostage. You do not move.'},
+  3: {act:'exileOne',   label:'Exile',
+      sub:'Move a Noble to another faction. You do not move.'},
+  4: {act:'rescueOne',  label:'Rescue', needsCaptive:true,
+      sub:'Return a captive Noble. Its captor receives an Intrigue card or advances an '+
+          'Emissary two spaces. You do not move.'},
 };
 
 const FACTIONS = [
@@ -928,11 +974,10 @@ const NOBLE_FINIAL  = ['orb','spike','cube','ring','diamond','cross'];
    Total: 20, and every base count is preserved. */
 const INTRIGUE_DEFS = {
   'On March': {n:2, when:'card',       d:'Choose your movement, 1–6. Play instead of an Honor card.'},
-  'Unseat the Paladin':    {n:2, when:'own',        d:'\u27a4 Turn the arrow away. No one is Paladin until the path is walked again.'},
+  'Rescue a Noble':       {n:2, when:'own',        d:'\u27a4 Return a captive Noble. Its captor receives an Intrigue card or advances an Emissary two spaces.'},
   'Hidden Archive':    {n:2, when:'own',        d:'Search the Intrigue discards and take one.'},
   'Eye of the Jester': {n:2, when:'any',        d:'Look at your own Status.'},
-  'Oathbreaker':          {n:2, when:'any',        d:'Move a Noble to another faction. \u27a4 The Noble becomes yours.',
-                                                    db:'Move a Noble to another faction.'},
+  'Supplant':             {n:2, when:'any',        d:'Return a rival\u2019s seated Noble to its owner\u2019s reserve, then seat one Noble from your reserve with a different faction. You cannot Supplant if your reserve is empty.'},
   'Defenestrate':      {n:2, when:'any',        d:'Remove a Noble from the board.'},
   'Oath of Fidelity':  {n:2, when:'any',        d:'Seat a Noble with a faction.'},
   'Plague':            {n:2, when:'completion', d:'Skip seating a Noble. Play at anyone\u2019s completion.'},
@@ -1013,10 +1058,26 @@ function ownersIn(fid){ return G.players.filter(q=>ownedIn(fid,q.i)>0); }
 function whose(actor, ownerIdx){
   if(!EXPANSION) return 'a';
   const v=G.players[ownerIdx];
-  return v===actor ? 'their own' : fmtP(v)+'\u2019s';
+  if(v===actor) return actor.isHuman ? 'your own' : 'their own';
+  return v.isHuman ? 'your' : fmtP(v)+'\u2019s';        // "your Noble", not "You's Noble"
 }
 /* What a contender is actually worth when THIS faction is called: their Status,
    the arrow if they hold it, and +1 for every Noble of theirs seated here. */
+/* --- hostages ---------------------------------------------------------- */
+function heldBy(captor,owner){ return (G.captives && G.captives[captor]) ? (G.captives[captor][owner]||0) : 0; }
+function heldTotal(captor){ return G.players.reduce((a,q)=>a+heldBy(captor,q.i),0); }
+/* Everyone currently holding one of this player's Nobles. */
+function captorsOf(ownerIdx){ return G.players.filter(q=>heldBy(q.i,ownerIdx)>0); }
+/* Capture reaches only Nobles seated on the board, and only a rival's: never one
+   still in a muster, never one already held by another captor, never your own. */
+function rivalNoblesIn(p,fid){ return G.players.reduce((a,q)=>a+(q===p?0:ownedIn(fid,q.i)),0); }
+function anyRivalNoble(p){ return FACTIONS.some(f=>rivalNoblesIn(p,f.id)>0); }
+function anyCaptivesOf(ownerIdx){ return captorsOf(ownerIdx).length>0; }
+
+/* You stand with the faction you currently support. The Paladin stands in every
+   faction. Standing decides both who may Call and who competes in the Call. */
+function standsIn(p,fid){ return p.faction===fid || isHeir(p); }
+
 function callScore(p,fid){
   // Nobles only add to Status in the expansion; the base game is Status alone.
   return effStatus(p) + (EXPANSION ? ownedIn(fid,p.i) : 0);
@@ -1048,7 +1109,7 @@ function newGame(nPlayers, quorumChoice, expansion){
   const statusDeck=shuffle([1,2,3,4,5,6,7,8,9]);
   const factionDeck=shuffle(FACTIONS.flatMap(f=>[f.id,f.id,f.id,f.id]));
   const intrigueDeck=shuffle(Object.entries(INTRIGUE_DEFS)
-    .filter(([k])=>EXPANSION || k!=='Unseat the Paladin')
+    .filter(([k])=>EXPANSION || k!=='Rescue a Noble')
     .flatMap(([k,v])=>Array(v.n).fill(k)));
   const players=[];
   for(let i=0;i<nPlayers;i++){
@@ -1062,27 +1123,25 @@ function newGame(nPlayers, quorumChoice, expansion){
       intrigues: [intrigueDeck.pop()],
       hand:[1,2,3,4,5,6], discard:[],
       emis: [{track:null,steps:0},{track:null,steps:0}],
+      reserve:NOBLES_EACH,               // your whole muster: six Nobles, and no more
       knownFactions:{},                  // {playerIndex: factionId} learned by looking
     });
   }
   const q = quorumChoice || 5;
-  // The supply is finite and one-way — exiled Nobles never come back. It scales
-  // with the court setting: measured over ~1100 simulated games, x3.6 leaves the
-  // clock as a genuine but rare backstop (it decides well under 1% of games)
-  // while a tighter supply was stealing a quarter of all endings.
-  const supply = Math.round((q+2)*3.6) + nPlayers;
   G = {
     players, statusDeck, factionDeck, intrigueDeck,
     statusDiscard:[], factionDiscard:[], intrigueDiscard:[],
     nobles:{charles:0,louis:0,italy:0,hunch:0},
     // per-faction tally of who seated each Noble; index = player
     owned:Object.fromEntries(FACTIONS.map(f=>[f.id, new Array(nPlayers).fill(0)])),
-    quorum:q, supply, supply0:supply, exiled:0,
+    // captives[captor][owner] = Nobles that captor is holding hostage
+    captives:Array.from({length:nPlayers},()=>new Array(nPlayers).fill(0)),
+    quorum:q,
     heir: null,
     turn: rint(nPlayers), over:false,
   };
   log(`The die is cast — ${fmtP(players[G.turn])} rolled highest and speaks first.`, 'sys');
-  log(`${EXPANSION?'The Heir’s Paladin':'Base game'} · quorum at <b>${q}</b> Nobles · coup at <b>${q+2}</b>.`, 'sys');
+  log(`${EXPANSION?'The Heir’s Paladin':'Base game'} · quorum at <b>${q}</b> Nobles · coup at <b>${q+2}</b> · <b>${NOBLES_EACH}</b> Nobles each.`, 'sys');
 }
 
 /* ============================================================
@@ -1121,13 +1180,12 @@ const SIDE = {
 const ICON_TIPS = {
   Army: [
     ['swap',  'Swap your faction with a rival \u2014 both of you see the new allegiance.'],
-    ['draw',  'Discard your faction and draw a new one.'],
+    ['draw',  'Choose your faction: look through the Faction deck, take the card you want, then shuffle.'],
     ['force', 'Force a rival to discard and draw a new faction.'],
     ['eye',   'Look at a rival\u2019s faction.'],
   ],
   Market: [
-    ['swap',  'Bribe: Move a Noble to another faction. \u27a4 The Noble becomes yours.',
-              'Bribe: Move a Noble to another faction.'],
+    ['swap',  'Bribe: Return a rival\u2019s seated Noble to their reserve, then seat one Noble from your reserve in another faction. You cannot Bribe if your reserve is empty.'],
     ['x',     'Purge: Remove 2 Nobles from the board.',
               'Purge: Remove 2 Nobles from the board.'],
   ],
@@ -2351,6 +2409,17 @@ function renderCourt(){
   if(nh) nh.textContent = 'Your Nobles (+1 each)';
   const mnBox=$('#mynobles');
   if(mnBox) mnBox.style.display = EXPANSION ? '' : 'none';
+  const cap=$('#capline');
+  if(cap){
+    const me=G.players[0];
+    const lost=G.players.reduce((a,q)=>a+heldBy(q.i,me.i),0);
+    const held=heldTotal(me.i);
+    const bits=[];
+    if(held) bits.push(`\u26d3 holding <b>${held}</b>`);
+    if(lost) bits.push(`<b>${lost}</b> of yours held`);
+    cap.innerHTML=bits.join(' \u00b7 ');
+    cap.style.display=bits.length? '':'none';
+  }
   const mn=$('#mynobles');
   if(mn && G.owned){
     const me=G.players[0];
@@ -2386,7 +2455,8 @@ function renderHUD(){
         <div class="mini status" title="${p.name}'s Status — visible to you, not to them"><span class="lbl">STATUS</span>${p.status}${isHeir(p)?'<span class="bonus">+1</span>':''}</div>
         ${fMini}
       </div>
-      <div class="meta"><span>Honor <b>${p.hand.length}</b></span><span>Intrigue <b>${p.intrigues.length}</b></span></div>`;
+      <div class="meta"><span>Honor <b>${p.hand.length}</b></span><span>Intrigue <b>${p.intrigues.length}</b></span><span title="Nobles left to place">\u265f <b>${p.reserve}</b></span>${
+        heldTotal(p.i)? `<span title="Nobles held hostage">\u26d3 <b>${heldTotal(p.i)}</b></span>`:''}</div>`;
     R.appendChild(d);
   });
 
@@ -2400,6 +2470,28 @@ function renderHUD(){
     ? 'You looked at it once — the card still faces away. Remember the number.'
     : 'Your Status faces away from you. Rivals read it; you cannot.')
     + (isHeir(me)? ' You hold the arrow: +1, a place in every Call, and the win on any tie.' : '');
+
+  // your muster, next to the Emissaries \u2014 filled pips are Nobles you can still seat
+  const mu=$('#muster'), mp=$('#musterpips');
+  if(mp){
+    const onBoard=FACTIONS.reduce((a,f)=>a+ownedIn(f.id,me.i),0);
+    const caged=G.players.reduce((a,q)=>a+heldBy(q.i,me.i),0);
+    mp.innerHTML='';
+    for(let k=0;k<NOBLES_EACH;k++){
+      const el=document.createElement('i');
+      if(k<me.reserve){ /* ready to seat */ }
+      else if(k<me.reserve+onBoard)       el.className='out';
+      else if(k<me.reserve+onBoard+caged) el.className='held';
+      else                                el.className='out';
+      mp.appendChild(el);
+    }
+    mu.classList.toggle('low', me.reserve>0 && me.reserve<=2);
+    mu.classList.toggle('empty', me.reserve===0);
+    mu.title = `Your muster: ${me.reserve} of ${NOBLES_EACH} still to seat`
+      + (onBoard? `, ${onBoard} on the board`:'')
+      + (caged? `, ${caged} held hostage`:'')
+      + (me.reserve===0? ' \u2014 completing a path will seat nothing.':'');
+  }
 
   // the two emissaries, held in hand
   const et=$('#emisdock'); et.innerHTML='';
@@ -2442,8 +2534,8 @@ function renderHUD(){
     c.innerHTML=(v===1?'<span class="pip">1 ✦</span>1':`<span class="pip">${v}</span>${v}`);
     c.title = v===1
       ? '1 movement point — and you draw an Intrigue card when you play it.'
-      : HONOR_POWER[v]
-        ? `${v} movement points — or spend it instead on: ${HONOR_POWER[v].label}. `+
+      : honorPower(v)
+        ? `${v} movement points — or spend it instead on: ${honorPower(v).label}. `+
           powerSub(v)
         : `${v} movement points`;
     if(canPlay) c.onclick=()=>humanEvent({type:'honor', v});
@@ -2462,7 +2554,7 @@ function renderHUD(){
       (HUMAN.kinds.includes('intrigue') && OWN_TURN.includes(name)) ||
       (HUMAN.kinds.includes('honor') && def.when==='card'));
     const b=document.createElement('button');
-    b.className='intr'+(name==='Unseat the Paladin'?' heircard':'');
+    b.className='intr'+(name==='Rescue a Noble'?' heircard':'');
     b.style.opacity=playableNow?1:.6;
     b.style.height=size[0]+'px';
     b.innerHTML=`<div class="t" style="font-size:${size[1]}px">${name}</div>`;
@@ -2580,20 +2672,73 @@ async function allocate(actor, owner, points){
 async function pathComplete(owner, actor, emi){
   const track=emi.track;
   emi.track=null; emi.steps=0; syncBoard();
+  if(actor.reserve<=0){
+    log(actor.isHuman
+      ? `You reach the centre, but your muster is spent — no Noble to seat.`
+      : `${fmtP(actor)} reaches the centre, but their muster is spent — no Noble to seat.`, 'sys');
+    if(actor.isHuman) await notice('No Nobles left',
+      'All six of your Nobles are placed, captured or gone. You seat none — but you still take the path action.');
+    // no Noble to seat, so the path action is all that is left
+    if(actor!==owner){ log(`${fmtP(actor)} takes no path action (forced completion).`); return; }
+    if(track==='Heir') await claimHeir(owner); else await pathAction(owner, track);
+    return;
+  }
+
+  /* On Army you may COMMAND \u2014 seat the Noble wherever you choose, and take no
+     Army action. Otherwise the deck decides and you take your action as normal. */
+  let command=false;
+  if(track==='Army' && actor===owner){
+    command = actor.isHuman
+      ? (await choose('The Army reaches the centre',
+          'Command the placement yourself, or let the deck decide and take an Army action instead.',
+          [{label:'Command', cls:'warn',
+            sub:'Seat this Noble with any faction you choose. You take no Army action.', value:'cmd'},
+           {label:'Counsel',
+            sub:'The Faction deck decides where the Noble goes, and you take one Army action.', value:'act'},
+          ])) === 'cmd'
+      : aiArmyCommands(actor);
+  }
+
   const plagued=await plagueWindow(actor);
   if(plagued) log(`The <b>Plague</b> sweeps the court — no Noble is seated.`, 'alert');
-  else {
+  else if(command){
     const f=await pickFactionForNoble(actor);
+    log(`${fmtP(actor)} commands the placement.`);
+    await placeNoble(f, actor, true);
+  } else {
+    const f=flipFaction();
+    log(`The deck turns up ${fmtF(f)}.`, 'sys');
     await placeNoble(f, actor, true);
   }
+
   if(actor!==owner){ log(`${fmtP(actor)} takes no path action (forced completion).`); return; }
+  if(command) return;                       // commanding the placement IS the action
   if(track==='Heir') await claimHeir(owner);
   else await pathAction(owner, track);
 }
 
+/* Commanding is worth it when a Noble in the right court matters more than the
+   allegiance action: when our own faction is close to a quorum we can win. */
+function aiArmyCommands(p){
+  // Placing where you want is worth about three quarters of a Noble; the
+  // allegiance actions are worth less than that unless something specific is
+  // wrong. So command by default, and take Counsel only for a real reason.
+  const home=aiBestHome(p);
+  const needHouse = home && home.fid!==p.faction && home.mine>ownedIn(p.faction,p.i);
+  const needEvict = blockedBy(p, p.faction);
+  const blind = others(p).some(o=>p.knownFactions[o.i]===undefined);
+  if(needHouse || needEvict) return false;                 // the action matters more
+  if(G.nobles[p.faction]+1>=coupAt()) return false;         // placing here would blow it up
+  if(blind && aiPressure()<0.6 && Math.random()<.35) return false;   // learn something early
+  return true;
+}
+
 /* fromSupply=false when a Noble is being moved rather than newly seated */
 async function placeNoble(fid, actor, fromSupply, creditTo){
-  if(fromSupply){ G.supply--; }
+  if(fromSupply){
+    if(actor.reserve<=0) return;      // their muster is spent; nothing to seat
+    actor.reserve--;
+  }
   G.nobles[fid]++;
   // normally the Noble belongs to whoever seated it; an Exile from an Honor card
   // moves a Noble without changing whose it is
@@ -2609,20 +2754,6 @@ async function placeNoble(fid, actor, fromSupply, creditTo){
     await callForThrone(fid, actor, 'coup');
     return;
   }
-  if(fromSupply && G.supply<=0){
-    const top=[...FACTIONS].sort((a,b)=>G.nobles[b.id]-G.nobles[a.id]);
-    const best=G.nobles[top[0].id];
-    const tied=top.filter(f=>G.nobles[f.id]===best);
-    let winner=tied[0];
-    if(tied.length>1){
-      const roll=d6();
-      winner=tied[roll % tied.length];
-      log(`The supply is spent and ${tied.length} factions stand level — a die is thrown (<b>${roll}</b>).`, 'alert');
-    }
-    log(`<b>THE SUPPLY IS SPENT.</b> The court will wait no longer — a Call for ${fmtF(winner.id)}.`, 'alert');
-    await callForThrone(winner.id, actor, 'supply');
-    return;
-  }
   if(!actor.isHuman){
     await humanReactionPopup('A Noble is seated',
       `${fmtP(actor)} seats a Noble with ${fmtF(fid)} — now <b>${G.nobles[fid]}</b> Noble${G.nobles[fid]===1?'':'s'}. `+
@@ -2630,10 +2761,14 @@ async function placeNoble(fid, actor, fromSupply, creditTo){
   }
 }
 
+/* Nothing ever destroys a Noble. Removing one sends them home to their own
+   lord's muster, ready to be seated again. Only Capture holds them out of play,
+   and even then a Rescue brings them back. */
 function strikeNoble(fid, owner){
   G.nobles[fid]--;
   if(G.owned[fid][owner]>0) G.owned[fid][owner]--;
-  G.exiled++; syncBoard(); renderCourt();
+  G.players[owner].reserve++;
+  syncBoard(); renderCourt(); renderHUD();
 }
 /* Removals are now aimed at a person, not just a faction. */
 function aiPickOwner(p, fid){
@@ -2644,8 +2779,9 @@ function aiPickOwner(p, fid){
 }
 /* Nobles belong to nobody in Throne \u2014 the ledger is still kept so the pieces
    can be removed consistently, but no one is ever asked or told whose it was. */
-async function chooseNobleOwner(actor, fid, title, desc){
-  const os=ownersIn(fid);
+async function chooseNobleOwner(actor, fid, title, desc, excludeSelf){
+  let os=ownersIn(fid);
+  if(excludeSelf) os=os.filter(q=>q!==actor);
   if(!os.length) return null;
   if(!EXPANSION) return os.reduce((a,b)=> ownedIn(fid,a.i)>=ownedIn(fid,b.i)? a:b).i;
   if(os.length===1) return os[0].i;
@@ -2655,6 +2791,15 @@ async function chooseNobleOwner(actor, fid, title, desc){
     sub: `${ownedIn(fid,q.i)} of theirs seated with ${F_BY_ID[fid].name}`,
     cls: q.isHuman? 'warn' : '',
     value: q.i })));
+}
+
+/* Placement is decided by the Faction deck, not by the player. Flip the top
+   card, seat the Noble with that faction, return the card and shuffle. Cards
+   held by players are out of the deck, so the odds shift as allegiances move. */
+function flipFaction(){
+  const pool = G.factionDeck.length ? G.factionDeck
+             : (G.factionDiscard.length ? G.factionDiscard : FACTIONS.map(f=>f.id));
+  return pool[rint(pool.length)];
 }
 
 async function pickFactionForNoble(actor){
@@ -2672,6 +2817,71 @@ async function pickFactionForNoble(actor){
 }
 
 /* ---- the arrow ---- */
+/* Reaching the centre of the Paladin's path no longer simply takes the arrow.
+   If someone already holds it, the two of them fight for it: one Honor card each,
+   face down, then flipped. Highest wins, and a tie goes to the challenger. */
+async function trialByCombat(challenger, holder){
+  banner('TRIAL BY COMBAT');
+  log(`\u2694 <b>Trial by Combat</b> \u2014 ${fmtP(challenger)} challenges ${fmtP(holder)} for the arrow.`, 'heir');
+
+  /* One unspent Honor card each. Nobody recovers a hand mid-trial: a duellist
+     with nothing left simply lays a value of 0. */
+  async function pledge(pl, foe){
+    if(!pl.hand.length){
+      log(`${fmtP(pl)} has no unspent Honor card and lays <b>0</b>.`, 'sys');
+      if(pl.isHuman) await notice('Trial by Combat',
+        'You have no unspent Honor card left, so you lay a value of <b>0</b>. '+
+        'Cards are not recovered in the middle of a Trial.');
+      return 0;
+    }
+    if(pl.isHuman){
+      const opts=[...pl.hand].sort((a,b)=>a-b).map(v=>({
+        label:String(v), sub:`${v===1?'Your Ace':'Your '+v} \u2014 discarded either way`, value:v}));
+      return await choose('Trial by Combat',
+        `You face <b>${foe.name}</b> for the Heir\u2019s arrow. Choose one unspent Honor card \u2014 `+
+        `it is discarded without providing movement or its printed ability. `+
+        `The higher card wins${challenger===pl?' \u2014 and a tie goes to you, the Challenger.'
+                                              :' \u2014 but a tie goes to the Challenger.'}`, opts);
+    }
+    // the rivals commit their best card when the arrow is worth holding
+    const want = (pl===challenger) ? true : effStatus(pl)>=5 || factionsAtQuorum().length>0;
+    const sorted=[...pl.hand].sort((a,b)=>b-a);
+    return want ? sorted[0] : sorted[Math.min(1,sorted.length-1)];
+  }
+
+  const cCard=await pledge(challenger, holder);
+  const hCard=await pledge(holder, challenger);
+  // both cards are discarded, and buy nothing else
+  [[challenger,cCard],[holder,hCard]].forEach(([pl,v])=>{
+    if(!v) return;                                  // a 0 is no card at all
+    const i=pl.hand.indexOf(v); if(i>=0){ pl.hand.splice(i,1); pl.discard.push(v); }
+  });
+  renderHUD();
+
+  const challengerWins = cCard>=hCard;              // ties go to the Challenger
+  log(`${fmtP(challenger)} lays <b>${cCard}</b>, ${fmtP(holder)} lays <b>${hCard}</b> \u2014 `+
+      `${challengerWins?fmtP(challenger):fmtP(holder)} takes the arrow`+
+      `${cCard===hCard?' on the Challenger\u2019s tie':''}.`, 'heir');
+
+  if(challenger.isHuman || holder.isHuman){
+    const me = challenger.isHuman ? challenger : holder;
+    const won = challengerWins===(me===challenger);
+    await notice(won? 'You win the trial' : 'You lose the trial',
+      `${fmtP(challenger)} laid <b>${cCard}</b>. ${fmtP(holder)} laid <b>${hCard}</b>.<br><br>`+
+      (cCard===hCard? 'A tie \u2014 and a tie goes to the Challenger. ' : '')+
+      (won? 'The arrow is yours.' : 'The arrow stays where it is.'));
+  }
+  // only now may an emptied hand be recovered
+  [challenger, holder].forEach(pl=>{
+    if(!pl.hand.length && pl.discard.length){
+      pl.hand.push(...pl.discard.splice(0)); pl.hand.sort((a,b)=>a-b);
+      log(`${fmtP(pl)} takes their discards back in hand.`, 'sys');
+    }
+  });
+  renderHUD();
+  return challengerWins;
+}
+
 async function claimHeir(p){
   if(isHeir(p)){
     log(`${fmtP(p)} walks the Paladin\u2019s path again — the arrow already points their way.`, 'heir');
@@ -2680,11 +2890,15 @@ async function claimHeir(p){
     return;
   }
   const prev=heirPlayer();
+  if(prev){
+    const won=await trialByCombat(p, prev);
+    if(!won){ syncBoard(); renderHUD(); return; }
+  }
   G.heir=p.i; syncBoard(); renderHUD();
   banner('THE ARROW TURNS');
   log(`➤ ${fmtP(p)} takes the Paladin\u2019s arrow${prev?` from ${prev.name}`:''} — <b>+1 Status</b>, a place in every Call, and the win on any tie.`, 'heir');
   if(p.isHuman) await notice('The arrow turns to you',
-    'You are the Heir\u2019s Paladin. Your Status counts <b>+1</b>, you stand among the contenders in every Call no matter which faction is named, and you take the crown on any tie.<br><br>You may not Call from this path — and any rival may Unseat the Paladin.');
+    'You are the Heir\u2019s Paladin. Your Status counts <b>+1</b>, you stand among the contenders in every Call no matter which faction is named, and you take the crown on any tie.<br><br>You may not Call from this path.');
   else if(prev && prev.isHuman) await notice('The arrow turns away',
     `${p.name} has walked the Paladin\u2019s path. The arrow no longer points at you.`);
 }
@@ -2694,7 +2908,7 @@ async function clearHeir(by){
   if(prev) log(`${fmtP(by)} turns the arrow away from ${fmtP(prev)}. No one is Paladin.`, 'heir');
   else log(`${fmtP(by)} turns the arrow away — it was already pointing at no one.`, 'heir');
   if(prev && prev.isHuman) await notice('You are no longer the Paladin',
-    `${by.name} played <b>Unseat the Paladin</b>. The arrow spins free — you lose the +1, your standing in every Call, and the tie-break.`);
+    `The arrow spins free — you lose the +1, your standing in every Call, and the tie-break.`);
 }
 
 /* ============================================================
@@ -2710,15 +2924,15 @@ async function humanPathAction(p, track){
   const per={
     Army:[
       {label:'Swap your faction', sub:'Trade Faction cards with a rival — both of you see the new allegiance.', value:'swapFaction'},
-      {label:'Draw a new faction', sub:'Discard yours and draw a new one.', value:'drawFaction'},
+      {label:'Choose your faction', sub:'Look through the Faction deck, take the card you want, then shuffle.', value:'drawFaction'},
       {label:'Force a new faction', sub:'A rival must discard and draw a new Faction card.', value:'forceFaction'},
       {label:'Look at a faction', sub:'Secretly learn which faction a rival backs.', value:'lookFaction'},
     ],
     Market:[
-      {label:'Bribe a Noble', value:'bribe', disabled:!anyRemovable(),
-       sub: anyRemovable() ? (EXPANSION ? 'Move a Noble to another faction. \u27a4 The Noble becomes yours.'
-                                          : 'Move a Noble to another faction.')
-                           : 'No Noble can be bribed — every faction is empty.'},
+      {label:'Bribe a Noble', value:'bribe', disabled: p.reserve<=0 || !anyRivalNoble(p),
+       sub: p.reserve<=0 ? 'Your reserve is empty — you cannot Bribe.'
+          : !anyRivalNoble(p) ? 'No rival has a Noble seated on the board.'
+          : 'Return a rival\u2019s seated Noble to their reserve, then seat one of yours with another faction.'},
       {label:'Purge 2 Nobles', value:'purge', disabled:!anyRemovable(),
        sub: anyRemovable() ? 'Remove 2 Nobles from the board.'
                            : 'No Noble can be purged — every faction is empty.'},
@@ -2731,10 +2945,12 @@ async function humanPathAction(p, track){
     ],
   };
   const opts=[...per[track]];
-  factionsAtQuorum().filter(f=>f.id===p.faction).forEach(f=>{
+  factionsAtQuorum().filter(f=>standsIn(p,f.id)).forEach(f=>{
+    const why = f.id===p.faction ? 'You support this faction.'
+                                 : 'You hold the arrow, so you stand in every faction.';
     opts.push({label:`⚜ CALL FOR THE THRONE — ${f.name}`, cls:'warn',
-      sub:`Put ${f.name} forward as Heir. All reveal, and their highest-Status supporter `+
-          `becomes the Heir\u2019s Paladin and wins the game.`, value:{call:f.id}});
+      sub:`${why} Put them forward as Heir — but rivals may answer with an Intrigue, and if `+
+          `the quorum breaks the Call fails and your action is spent.`, value:{call:f.id}});
   });
   opts.push({label:'Pass', sub:'Take no action.', value:'pass'});
   const v=await choose(`${track} — path action`,
@@ -2805,22 +3021,62 @@ const ACTIONS={
     renderHUD();
   },
   /* --- the Honor card abilities --- */
-  /* Raid: one Noble off the board for good. The Market's Purge does two. */
-  async raidOne(p){
-    if(!anyRemovable()){ if(p.isHuman) await notice('Raid','There is no Noble on the board to raid.'); return; }
+  /* Raid: one Noble off the board. The Market's Purge does two. */
+  /* Capture: the Noble leaves the board but is not destroyed \u2014 you hold them,
+     and they can be rescued back. */
+  async captureOne(p){
+    if(!anyRivalNoble(p)){
+      if(p.isHuman) await notice('Capture','No rival has a Noble seated on the board to capture.');
+      return;
+    }
     const f = p.isHuman
-      ? await chooseFactionFrom(p,'Raid','Take one Noble off the board for good.', x=>canRemoveFrom(x.id))
+      ? await chooseFactionFrom(p,'Capture','Seize a rival\u2019s Noble and hold them hostage.',
+          x=>rivalNoblesIn(p,x.id)>0, ()=>'no rival Noble seated here')
       : aiDisruptTarget(p);
-    if(!f) return;
-    const ow = await chooseNobleOwner(p, f, 'Raid \u2014 whose Noble?',
-      `Whose Noble is cut down in ${F_BY_ID[f].name}?`);
+    if(!f || rivalNoblesIn(p,f)<=0) return;
+    const ow = await chooseNobleOwner(p, f, 'Capture \u2014 whose Noble?',
+      `Whose Noble is seized out of ${F_BY_ID[f].name}?`, true);
     if(ow===null||ow===undefined) return;
-    const v=G.players[ow];
-    strikeNoble(f, ow);
-    log(`${fmtP(p)} raids ${whose(p,ow)} Noble from ${fmtF(f)}.`);
+    G.nobles[f]--; if(G.owned[f][ow]>0) G.owned[f][ow]--;
+    G.captives[p.i][ow]=(G.captives[p.i][ow]||0)+1;
+    syncBoard(); renderCourt(); renderHUD();
+    log(`${fmtP(p)} captures ${whose(p,ow)} Noble out of ${fmtF(f)} and holds them hostage.`);
+  },
+  /* Rescue: buy back one of your own, and the captor is paid for the loss. */
+  async rescueOne(p){
+    const captors=captorsOf(p.i);
+    if(!captors.length){ if(p.isHuman) await notice('Rescue','None of your Nobles are being held.'); return; }
+    let captor;
+    if(p.isHuman){
+      captor = captors.length===1 ? captors[0].i : await choose('Rescue \u2014 from whom?',
+        'Which captor gives up your Noble?', captors.map(q=>({
+          label:q.isHuman?'Your own keeping':q.name,
+          sub:`holding ${heldBy(q.i,p.i)} of yours`, value:q.i})));
+    } else {
+      captor = captors.reduce((a,b)=>heldBy(a.i,p.i)>=heldBy(b.i,p.i)?a:b).i;
+    }
+    if(captor===null||captor===undefined) return;
+    G.captives[captor][p.i]--;
+    p.reserve++;
+    const c=G.players[captor];
+    log(`${fmtP(p)} rescues a Noble from ${c.isHuman?'your':fmtP(c)+'\u2019s'} keeping \u2014 `+
+        `back to ${p.isHuman?'your':fmtP(p)+'\u2019s'} reserve.`);
+    // the captor is compensated
+    let comp;
+    if(c.isHuman){
+      comp=await choose('Your hostage is rescued',
+        `${p.name} has bought back a Noble you were holding. Take your recompense.`,
+        [{label:'Draw an Intrigue', sub:'One card from the deck.', value:'card'},
+         {label:'Advance 2 steps', sub:'Move your Emissaries two steps.', value:'move'}]);
+    } else {
+      comp = (minCompletion(c)<=2 || c.intrigues.length>=3) ? 'move' : 'card';
+    }
+    if(comp==='card'){ drawIntrigue(c); log(`${fmtP(c)} takes an Intrigue card in recompense.`); }
+    else { log(`${fmtP(c)} takes two steps in recompense.`); await allocate(c,c,2); }
+    syncBoard(); renderCourt(); renderHUD();
   },
   /* Exile: drive a Noble to another faction. It stays whoever's it was —
-     only the Market's Bribe can actually buy a Noble's loyalty. */
+     only the Market's Bribe can put your own man in a rival's place. */
   async exileOne(p){
     if(!anyRemovable()){ if(p.isHuman) await notice('Exile','There is no Noble on the board to exile.'); return; }
     let from,to,ow;
@@ -2845,24 +3101,47 @@ const ACTIONS={
   },
 
   /* --- Market: nobles --- */
+  /* Bribe: return a RIVAL'S seated Noble to their reserve, then seat one of your
+     own with another faction. Your Noble takes the field in their stead, so an
+     empty reserve blocks it, and it never targets yourself. */
   async bribe(p){
+    if(p.reserve<=0){
+      if(p.isHuman) await notice('Bribe','Your reserve is empty \u2014 you have no Noble to send in their place.');
+      return;
+    }
+    if(!anyRivalNoble(p)){
+      if(p.isHuman) await notice('Bribe','No rival has a Noble seated on the board.');
+      return;
+    }
     let from,to,owner;
     if(p.isHuman){
-      from=await chooseFactionFrom(p,'Bribe a Noble — from','Buy a Noble away from which faction?', f=>canRemoveFrom(f.id));
-      owner=await chooseNobleOwner(p, from, 'Bribe — whose Noble?',
-        'You buy their loyalty as well — the Noble becomes yours.');
-      to=await chooseFactionFrom(p,'Bribe a Noble — to','…and who do they serve now?', f=>f.id!==from, ()=>'the Noble is leaving here');
-    } else { from=p._from; to=p._to; owner=aiPickOwner(p,from); }
-    if(owner===null||owner===undefined) return;
+      from=await chooseFactionFrom(p,'Bribe \u2014 whose court?','Take a rival\u2019s Noble out of which faction?',
+        f=>rivalNoblesIn(p,f.id)>0, ()=>'no rival Noble seated here');
+      if(!from) return;
+      owner=await chooseNobleOwner(p, from, 'Bribe \u2014 whose Noble?',
+        'They go home to their own reserve, and one of yours takes their place.', true);
+      if(owner===null||owner===undefined) return;
+      to=await chooseFactionFrom(p,'Bribe \u2014 where do you seat yours?',
+        'Seat one Noble from your reserve with another faction.',
+        f=>f.id!==from, ()=>'they were just bought out of here');
+    } else {
+      from=p._from;
+      if(!from || rivalNoblesIn(p,from)<=0) return;
+      owner=aiPickOwner(p,from);
+      to=p._to;
+    }
+    if(!from || !to || owner===null || owner===undefined) return;
     const prev=G.players[owner];
-    G.nobles[from]--; G.owned[from][owner]--; syncBoard();
-    log(EXPANSION
-      ? `${fmtP(p)} bribes ${whose(p,owner)} Noble away from ${fmtF(from)}, loyalty and all\u2026`
-      : `${fmtP(p)} bribes a Noble away from ${fmtF(from)}\u2026`);
-    await placeNoble(to,p,false);      // seated anew, and credited to the briber
+    if(prev===p) return;                        // never your own Noble
+    G.nobles[from]--; G.owned[from][owner]--;
+    prev.reserve++;                             // theirs returns to their reserve
+    syncBoard();
+    log(`${fmtP(p)} bribes ${whose(p,owner)} Noble out of ${fmtF(from)} \u2014 `+
+        `they return to ${prev.isHuman?'your':fmtP(prev)+'\u2019s'} reserve.`);
+    await placeNoble(to,p,true);                // and one of yours takes the field
   },
-  /* Purge takes two Nobles off the board for good, from one faction or from
-     two. It stops early only when nothing further can legally be taken. */
+  /* Purge takes two Nobles off the board, from one faction or from two. They are
+     not destroyed \u2014 each goes back to its own lord's muster. */
   async purge(p){
     let taken=0;
     for(let k=0;k<2 && !G.over;k++){
@@ -2884,9 +3163,9 @@ const ACTIONS={
       const victim=G.players[owner];
       strikeNoble(f, owner); taken++;
       log(EXPANSION
-        ? `${fmtP(p)} purges ${whose(p,owner)} Noble from ${fmtF(f)} `+
-          `(${victim===p?'they':victim.name} now ${ownedIn(f,owner)} there).`
-        : `${fmtP(p)} purges a Noble from ${fmtF(f)} (${G.nobles[f]} left).`);
+        ? `${fmtP(p)} purges ${whose(p,owner)} Noble out of ${fmtF(f)} `+
+          `\u2014 they return to ${victim===p?(p.isHuman?'your':'their'):fmtP(victim)+'\u2019s'} muster.`
+        : `${fmtP(p)} purges a Noble out of ${fmtF(f)} \u2014 they return to their muster.`);
     }
     if(taken===0) log(`${fmtP(p)} calls for a purge, but no Noble can be touched.`);
   },
@@ -2905,12 +3184,48 @@ const ACTIONS={
     }
     renderHUD();
   },
+  /* Look through the Faction deck and take the card you want, then shuffle.
+     Only ever your own allegiance \u2014 a rival can only be made to redraw blind.
+     The card you take leaves the deck, so it can no longer come up on a flip. */
   async drawFaction(p){
-    G.factionDiscard.push(p.faction);
-    p.faction=drawFrom(G.factionDeck,G.factionDiscard);
+    const avail=[...new Set(G.factionDeck)];
+    if(!avail.length){
+      if(p.isHuman) await notice('Choose your allegiance','The Faction deck is empty \u2014 there is no card to take.');
+      return;
+    }
+    let picked;
+    if(p.isHuman){
+      picked=await choose('Choose your allegiance',
+        'Look through the Faction deck and take the card you want. Your old card is shuffled back in.',
+        FACTIONS.map(f=>{
+          const left=G.factionDeck.filter(x=>x===f.id).length;
+          const mine=ownedIn(f.id,p.i), cnt=G.nobles[f.id];
+          let sub=`${cnt} Noble${cnt===1?'':'s'} seated`;
+          if(mine) sub+=` \u2014 <b>${mine} yours</b>`;
+          if(cnt>=quorum()) sub+=' \u00b7 at quorum';
+          sub+=` \u00b7 ${left} in the deck`;
+          const off = left===0 || f.id===p.faction;
+          if(f.id===p.faction) sub+=' (you already back this)';
+          else if(!left) sub=' none left in the deck';
+          return {label:f.name, cls:'f'+f.id, sub, value:f.id, disabled:off};
+        }));
+    } else {
+      const home=aiBestHome(p);
+      const want=(home && home.fid!==p.faction && avail.includes(home.fid)) ? home.fid : null;
+      picked = want || avail.filter(x=>x!==p.faction)
+        .sort((a,b)=>ownedIn(b,p.i)-ownedIn(a,p.i))[0];
+    }
+    if(!picked) return;
+    const i=G.factionDeck.indexOf(picked);
+    if(i<0) return;
+    G.factionDeck.splice(i,1);              // taken out of the deck
+    G.factionDeck.push(p.faction);          // the old card goes back in
+    shuffle(G.factionDeck);
+    p.faction=picked;
     G.players.forEach(q=>{ if(q!==p) delete q.knownFactions[p.i]; });
-    log(`${fmtP(p)} discards their Faction card and draws a new allegiance.`);
-    if(p.isHuman) await notice('New allegiance', `You now back <b>${F_BY_ID[p.faction].name}</b>.`);
+    log(`${fmtP(p)} searches the Faction deck and takes a new allegiance.`);
+    if(p.isHuman) await notice('New allegiance',
+      `You now back <b>${F_BY_ID[p.faction].name}</b>. Nobody saw which card you took.`);
     renderHUD();
   },
   async forceFaction(p){
@@ -2952,8 +3267,8 @@ function drawIntrigue(p){
 }
 
 /* Reaction popup for the human. Offers only cards legal at this moment:
-   Unseat the Paladin is deliberately absent — it is an own-turn card, so the arrow
-   can be stripped in advance but never sniped at the instant of payoff. */
+   own-turn cards are deliberately absent, so nothing can be sniped at the very
+   instant of payoff. */
 async function humanReactionPopup(title, desc, context){
   const me=G.players[0];
   if(!me.isHuman) return null;
@@ -2963,6 +3278,7 @@ async function humanReactionPopup(title, desc, context){
       opts.push({label:'Breach of Order', cls:'warn', sub:INTRIGUE_DEFS['Breach of Order'].d, value:'Breach of Order'});
     if(context==='completion' && me.intrigues.includes('Plague'))
       opts.push({label:'Plague', cls:'warn', sub:INTRIGUE_DEFS['Plague'].d, value:'Plague'});
+    if(context==='call') opts.push({label:'Let it stand', sub:'Play nothing and let the Call resolve.', value:null});
     ANYTIME.forEach(n=>{
       if(me.intrigues.includes(n)) opts.push({label:n, sub:INTRIGUE_DEFS[n].d+' (anytime)', value:n});
     });
@@ -2990,8 +3306,8 @@ async function breachWindow(p, name){
     } else if(q.intrigues.includes('Breach of Order')){
       let odds=0;
       if(name==='Plague') odds=.5;
-      else if(name==='Unseat the Paladin') odds = isHeir(q)? .85 : .12;   // defend your own arrow
-      else if(['Oath of Fidelity','Oathbreaker','Defenestrate'].includes(name)) odds=.28;
+      else if(name==='Rescue a Noble') odds=.2;
+      else if(['Oath of Fidelity','Supplant','Defenestrate'].includes(name)) odds=.28;
       cancels = Math.random()<odds;
     }
     if(cancels){
@@ -3016,7 +3332,7 @@ async function plagueWindow(actor){
       plays = r==='Plague';
       if(G.over) return false;
     } else if(q.intrigues.includes('Plague')){
-      const threat = selfEffEstimate(actor)>=6 || factionsAtQuorum().length>0 || G.supply<=3;
+      const threat = selfEffEstimate(actor)>=6 || factionsAtQuorum().length>0;
       plays = Math.random() < (threat? .5 : .16);
     }
     if(plays){
@@ -3037,9 +3353,10 @@ async function playIntrigue(p, name){
   const canceled=await breachWindow(p, name);
   if(canceled) return;
   switch(name){
-    case 'Unseat the Paladin':
+    case 'Rescue a Noble':
       G.intrigueDiscard.push(name);
-      await clearHeir(p);
+      renderHUD();
+      await ACTIONS.rescueOne(p);
       return;
     case 'Eye of the Jester':
       p.knownStatus=p.status;
@@ -3061,23 +3378,44 @@ async function playIntrigue(p, name){
       log(`${fmtP(p)} retrieves <b>${choiceN}</b> from the archive.`);
       break;
     }
-    case 'Oathbreaker': {
+    case 'Supplant': {
+      /* Same shape as the Market's Bribe, but from the hand: a rival's Noble goes home
+         owner's reserve, and one of yours takes the field elsewhere. Your Noble
+         pays for it, so an empty reserve means the card cannot be played. */
+      if(p.reserve<=0){
+        if(p.isHuman) await notice(name,'Your reserve is empty \u2014 you have no Noble to send in their place.');
+        break;
+      }
+      if(!anyRivalNoble(p)){
+        if(p.isHuman) await notice(name,'No rival has a Noble seated on the board.');
+        break;
+      }
       let from,to,ow;
       if(p.isHuman){
-        if(!anyRemovable()){ await notice('Oathbreaker','No Noble can be moved — every faction is empty.'); break; }
-        from=await chooseFactionFrom(p,'Oathbreaker — from','Move a Noble away from…', f=>canRemoveFrom(f.id));
+        from=await chooseFactionFrom(p,`${name} \u2014 whose court?`,'Take a rival\u2019s Noble out of which faction?',
+          f=>rivalNoblesIn(p,f.id)>0, ()=>'no rival Noble seated here');
         if(!from) break;
-        ow=await chooseNobleOwner(p, from, 'Oathbreaker — whose Noble?',
-          'Whose oath is broken? The Noble becomes yours.');
+        ow=await chooseNobleOwner(p, from, `${name} \u2014 whose Noble?`,
+          'They go home to their own reserve, and one of yours takes the field.', true);
         if(ow===null||ow===undefined) break;
-        to=await chooseFactionFrom(p,'Oathbreaker — to','…and seat them with:', f=>f.id!==from, ()=>'the Noble is leaving here');
-      } else { from=p._from; to=p._to; ow=aiPickOwner(p,from); }
-      if(!from || ow===null || ow===undefined) break;
+        to=await chooseFactionFrom(p,`${name} \u2014 where do you seat yours?`,
+          'Seat one Noble from your reserve with a different faction.',
+          f=>f.id!==from, ()=>'they were just driven out of here');
+      } else {
+        from=p._from;
+        if(!from || rivalNoblesIn(p,from)<=0) break;
+        ow=aiPickOwner(p,from); to=p._to;
+      }
+      if(!from || !to || ow===null || ow===undefined) break;
       const was=G.players[ow];
-      G.nobles[from]--; G.owned[from][ow]--; syncBoard();
-      log(`${fmtP(p)} finds an <b>Oathbreaker</b> — ${whose(p,ow)} Noble abandons ${fmtF(from)}.`);
+      if(was===p) break;
+      G.nobles[from]--; G.owned[from][ow]--;
+      was.reserve++;
+      syncBoard();
+      log(`${fmtP(p)} plays <b>${name}</b> \u2014 ${whose(p,ow)} Noble leaves ${fmtF(from)} `+
+          `and returns to ${was.isHuman?'your':fmtP(was)+'\u2019s'} reserve.`);
       G.intrigueDiscard.push(name); renderHUD();
-      await placeNoble(to,p,false);
+      await placeNoble(to,p,true);
       return;
     }
     case 'Defenestrate': {
@@ -3088,10 +3426,15 @@ async function playIntrigue(p, name){
       if(dOwner===null||dOwner===undefined) break;
       const dv=G.players[dOwner];
       strikeNoble(f, dOwner);
-      log(`${fmtP(p)} defenestrates ${whose(p,dOwner)} Noble from ${fmtF(f)}.`);
+      log(`${fmtP(p)} defenestrates ${whose(p,dOwner)} Noble out of ${fmtF(f)} \u2014 `+
+        `they return to ${dv===p?(p.isHuman?'your':'their'):fmtP(dv)+'\u2019s'} muster.`);
       break;
     }
     case 'Oath of Fidelity': {
+      if(p.reserve<=0){
+        if(p.isHuman) await notice('Oath of Fidelity','Your muster is spent — you have no Noble to seat.');
+        break;
+      }
       const f=await pickFactionForNoble(p);
       log(`A Noble swears fidelity to ${fmtF(f)}.`);
       G.intrigueDiscard.push(name); renderHUD();
@@ -3106,42 +3449,90 @@ async function playIntrigue(p, name){
 /* ============================================================
    Part D2: Call for the Throne & reveal
    ============================================================ */
-/* Contenders are everyone backing the named faction, plus the Heir, always.
-   The Heir's +1 is counted, and the Heir wins every tie — the arrow is the
-   tiebreaker as well as the bonus. Ties between two non-Heirs (possible once
-   Status cards recycle through the discard) go to whoever is nearest the
-   caller in turn order, so the rule always resolves. */
-function resolveWinner(fid, anchorIdx){
-  const contenders=G.players.filter(p=>p.faction===fid || isHeir(p));
+/* Everyone standing in the named faction competes, and the Paladin stands
+   everywhere. Ties are settled twice over: the Paladin wins any tie they share,
+   and otherwise the higher PRINTED Status takes it \u2014 the card itself, before
+   Nobles or the arrow are added. Status cards are unique across the table, so
+   that second test always decides. */
+function resolveWinner(fid){
+  const contenders=G.players.filter(p=>standsIn(p,fid));
   if(!contenders.length) return {winner:null, contenders};
-  const n=G.players.length;
-  const dist=p=>(p.i-anchorIdx+n)%n;
   let best=null;
   contenders.forEach(p=>{
     if(!best){ best=p; return; }
     const a=callScore(p,fid), b=callScore(best,fid);
     if(a>b){ best=p; return; }
     if(a<b) return;
-    if(isHeir(p)!==isHeir(best)){ if(isHeir(p)) best=p; return; }
-    if(dist(p)<dist(best)) best=p;
+    if(isHeir(p)!==isHeir(best)){ if(isHeir(p)) best=p; return; }  // the arrow settles it
+    if(p.status>best.status) best=p;                               // else the printed card
   });
   return {winner:best, contenders};
 }
 
+/* A Call is declared, not resolved. Every other player in turn order may answer
+   it with an Intrigue; if the faction is knocked below the quorum before the
+   answers run out, the Call fails and the game goes on. */
+async function callWindow(fid, caller){
+  const start = caller ? caller.i : G.turn;
+  for(let k=1;k<=G.players.length;k++){
+    const q=G.players[(start+k)%G.players.length];
+    if(q===caller) continue;
+    if(G.nobles[fid]<quorum()) break;              // already broken
+    if(q.isHuman){
+      await humanReactionPopup('A Call for the Throne',
+        `${caller?fmtP(caller):'The court'} calls for ${fmtF(fid)}, which holds `+
+        `<b>${G.nobles[fid]}</b> Noble${G.nobles[fid]===1?'':'s'}. `+
+        `Break the quorum and the Call fails.`, 'call');
+      if(G.over) return false;
+    } else {
+      await aiAnswerCall(q, fid);
+    }
+  }
+  return G.nobles[fid]>=quorum();
+}
+
+/* A rival answers only if the Call would beat them and they can actually break it. */
+async function aiAnswerCall(q, fid){
+  const stake = (q.faction===fid || isHeir(q)) ? callScore(q,fid) : -1;
+  const best = Math.max(...G.players.filter(p=>p.faction===fid||isHeir(p)).map(p=>callScore(p,fid)));
+  if(stake>=best) return;                          // they are winning it; let it stand
+  const margin = G.nobles[fid]-quorum();
+  if(q.intrigues.includes('Defenestrate') && margin<=0 && canRemoveFrom(fid)){
+    q._from=fid; await playIntrigue(q,'Defenestrate'); return;
+  }
+  if(q.intrigues.includes('Supplant') && margin<=0 && q.reserve>0 && rivalNoblesIn(q,fid)>0){
+    const to=(FACTIONS.find(f=>f.id!==fid)||{}).id;
+    q._from=fid; q._to=to; await playIntrigue(q,'Supplant');
+  }
+}
+
 async function callForThrone(fid, caller, mode){
+  banner('CALL FOR THE THRONE');
+  const how = mode==='coup' ? 'The coup forces' : fmtP(caller)+' makes';
+  log(`${how} a <b>Call for the Throne</b> — ${fmtF(fid)}.`, 'alert');
+
+  const stands = await callWindow(fid, caller);
+  if(G.over) return;
+  if(!stands){
+    log(`The Call fails — ${fmtF(fid)} no longer holds a quorum `+
+        `(<b>${G.nobles[fid]}</b> of ${quorum()}). Play goes on.`, 'alert');
+    if(G.players[0].isHuman) await notice('The Call fails',
+      `${F_BY_ID[fid].name} was broken below the quorum before the Call could resolve. `+
+      `The court returns to its business.`);
+    renderCourt(); renderHUD();
+    return;
+  }
+
   G.over=true;
   SCENE.callCrown();
-  banner('CALL FOR THE THRONE');
-  const how = mode==='coup' ? 'The coup forces' : mode==='supply' ? 'The spent supply forces' : fmtP(caller)+' makes';
-  log(`${how} a <b>Call for the Throne</b> — ${fmtF(fid)}.`, 'alert');
   await wait(1700);
 
-  const {winner, contenders}=resolveWinner(fid, caller ? caller.i : G.turn);
+  const {winner, contenders}=resolveWinner(fid);
   const f=F_BY_ID[fid];
   const heir=heirPlayer();
 
   $('#revsub').innerHTML =
-    `${mode==='coup'?'The coup carries':mode==='supply'?'The exhausted court settles on':'The Call goes up for'} `+
+    `${mode==='coup'?'The coup carries':'The Call goes up for'} `+
     `<b style="color:${f.css}">${f.name}</b> — every Faction and Status is turned face up.`+
     (heir&&EXPANSION? `<br>${heir.name} held the arrow: <b>+1</b>, a place in the Call whichever faction was named, and the win on a tie.` : '')+
     (winner
@@ -3209,15 +3600,19 @@ async function humanTurn(p){
     }
     if(ev.type==='honor'){
       const v=ev.v;
-      const power=HONOR_POWER[v];
+      const power=honorPower(v);
       let usePower=false;
       if(power){
-        const canDo=anyRemovable();
+        const canDo = power.needsCaptive ? anyCaptivesOf(p.i)
+                    : power.needsRival ? anyRivalNoble(p) : anyRemovable();
         const pick=await choose(`Play the ${v}`,
           `The <b>${v}</b> may be spent for movement or for its favour \u2014 not both.`,
           [{label:`Move ${v}`, sub:`Advance your Emissaries ${v} step${v===1?'':'s'}.`, value:'move'},
            {label:power.label, sub: canDo? powerSub(v)
-              : 'No Noble on the board to act on.', value:'power', disabled:!canDo, cls:'warn'}]);
+              : (power.needsCaptive ? 'None of your Nobles are being held.'
+                 : power.needsRival  ? 'No rival has a Noble seated on the board.'
+                                     : 'No Noble on the board to act on.'),
+            value:'power', disabled:!canDo, cls:'warn'}]);
         usePower = pick==='power';
       }
       p.hand.splice(p.hand.indexOf(v),1); p.discard.push(v);
@@ -3264,7 +3659,7 @@ function aiCallConfidence(p, fid){
 }
 /* You may only Call for the faction you yourself back. */
 function aiCallableFactions(p){
-  return factionsAtQuorum().filter(f=>f.id===p.faction);
+  return factionsAtQuorum().filter(f=>standsIn(p,f.id));
 }
 /* How dangerous is the strongest rival position on the board right now?
    Weighted by how close that faction is to being able to Call. */
@@ -3288,6 +3683,31 @@ function aiMarginAt(p, o, fid){
 }
 /* The single most dangerous rival position, weighted by how close that faction
    is to being callable and how likely the rival is to be standing in it. */
+/* Which faction would be worth most to us if we backed it? Our own Nobles there,
+   weighted by how close that faction is to being callable. */
+function aiBestHome(p){
+  let best=null;
+  const mineIf = f => selfEffEstimate(p) + ownedIn(f,p.i);
+  FACTIONS.forEach(f=>{
+    const mine=ownedIn(f.id,p.i);
+    if(!mine) return;
+    // never walk into a court where someone we have read already stands higher
+    if(blockedBy(p,f.id)) return;
+    const cnt=G.nobles[f.id];
+    const near = cnt>=quorum() ? 1.6 : (cnt>=quorum()-1 ? 1.2 : 0.7);
+    const val=mine*near;
+    if(!best || val>best.val) best={fid:f.id, val, mine};
+  });
+  return best;
+}
+/* Is there a rival we KNOW backs this faction who would beat us in it? This is
+   what a peek is really for: not attacking, but knowing where not to stand. */
+function blockedBy(p, fid){
+  const mine=selfEffEstimate(p)+ownedIn(fid,p.i);
+  return others(p).some(o=>
+    p.knownFactions[o.i]===fid && effStatus(o)+ownedIn(fid,o.i) > mine + 1);
+}
+
 function aiTopThreat(p){
   let best=null;
   FACTIONS.forEach(f=>{
@@ -3368,6 +3788,7 @@ function aiPickFaction(p){
     // every Noble seated with your own faction is a point at the Call, so bank them
     let s = usable ? (confident? 6+n*0.5 : -3) : (2 - n*0.4 + Math.random()*1.5);
     if(own) s += 4 + ownedIn(f.id,p.i)*0.8;
+    if(usable && blockedBy(p,f.id)) s -= 3;   // a court we know is likely lost
     if(n+1>=q && !usable && !triggersCoup) s-=2;
     if(triggersCoup) s = (usable && confident && aiCallConfidence(p,f.id)>.5) ? 50 : -1e6;
     if(s>bestScore){ bestScore=s; bestId=f.id; }
@@ -3394,24 +3815,66 @@ async function aiPathAction(p, track){
     const threat=aiTopThreat(p);
     // Bribe is the sharpest tool on the board: it takes a point off the leader
     // and puts the same point on us. Always prefer it against a live threat.
-    if(threat && threat.fid!==p.faction && canRemoveFrom(threat.fid)
+    if(p.reserve>0 && threat && threat.fid!==p.faction && rivalNoblesIn(p,threat.fid)>0
        && G.nobles[p.faction]+1<coupAt()){
       p._from=threat.fid; p._to=p.faction;
       return ACTIONS.bribe(p);
     }
-    const donors=FACTIONS.filter(f=>f.id!==p.faction && canRemoveFrom(f.id));
-    if(donors.length && G.nobles[p.faction]+1<coupAt()){
+    const donors=FACTIONS.filter(f=>f.id!==p.faction && rivalNoblesIn(p,f.id)>0);
+    if(p.reserve>0 && donors.length && G.nobles[p.faction]+1<coupAt()){
       const worth=f=>Math.max(0,...others(p).map(o=>ownedIn(f.id,o.i)));
       p._from=donors.sort((a,b)=>worth(b)-worth(a)||G.nobles[b.id]-G.nobles[a.id])[0].id;
       p._to=p.faction;
       return ACTIONS.bribe(p);
     }
+    // Purge only sends two Nobles home to be seated again; it buys time, not points
     if(anyRemovable()) return ACTIONS.purge(p);
     log(`${fmtP(p)} finds no one to bribe and no one to purge.`);
     return;
   }
   // Army \u2014 allegiance
   const armyThreat=aiTopThreat(p);
+
+  /* Your Nobles only score in the faction that is called, so the sharpest thing
+     the Army can do is move YOU to where your own Nobles already stand. */
+  // Someone we have read is standing higher in our own court. Evicting them is
+  // better than leaving: their bank is orphaned and ours is untouched. Only if
+  // we have somewhere concretely better to stand do we move ourselves.
+  /* Trading Faction cards with the player we most fear is the surest weapon on
+     this path: their bank is stranded for certain, where a forced redraw leaves
+     them in place one time in four. Only worth it if the swing favours us. */
+  {
+    let bestSwap=null;
+    others(p).forEach(o=>{
+      const theirs=p.knownFactions[o.i];
+      if(theirs===undefined || theirs===p.faction) return;
+      const theyLose = ownedIn(theirs,o.i) - ownedIn(p.faction,o.i);
+      const weGain   = ownedIn(theirs,p.i)  - ownedIn(p.faction,p.i);
+      const nearQ    = G.nobles[theirs]>=quorum()-1 ? 1.4 : 1;
+      const swing=(theyLose+weGain)*nearQ;
+      if(theyLose>0 && swing>=2 && (!bestSwap||swing>bestSwap.swing))
+        bestSwap={o, swing};
+    });
+    if(bestSwap){ p._target=bestSwap.o; return ACTIONS.swapFaction(p); }
+  }
+
+  const blocker=others(p).find(o=>p.knownFactions[o.i]===p.faction
+    && effStatus(o)+ownedIn(p.faction,o.i) > selfEffEstimate(p)+ownedIn(p.faction,p.i));
+  if(blocker){
+    const better=others(p).find(o=>{
+      const f=p.knownFactions[o.i];
+      return f!==undefined && f!==p.faction && !blockedBy(p,f)
+             && ownedIn(f,p.i) > ownedIn(p.faction,p.i);
+    });
+    if(better){ p._target=better; return ACTIONS.swapFaction(p); }
+    p._target=blocker; return ACTIONS.forceFaction(p);
+  }
+  const home=aiBestHome(p);
+  const hereNow=ownedIn(p.faction,p.i);
+  // the card we want can be taken straight out of the deck
+  if(home && home.fid!==p.faction && home.mine>hereNow
+     && G.factionDeck.includes(home.fid)) return ACTIONS.drawFaction(p);
+
   // A rival with a deep stack has committed to one faction. Force them to draw a
   // new Faction card and the whole investment may be orphaned \u2014 the single
   // most damaging thing this path can do.
@@ -3440,12 +3903,9 @@ async function aiTurn(p){
   const eager = x => Math.random() < x*press*press;
   const threat0=aiTopThreat(p);
 
-  // strip a dangerous arrow before anything else
-  if(p.intrigues.includes('Unseat the Paladin') && G.heir!==null && !isHeir(p)){
-    const h=heirPlayer();
-    const dangerous = effStatus(h)>=6 || factionsAtQuorum().length>0 || G.supply<=4;
-    if(dangerous && eager(.9)) await playIntrigue(p,'Unseat the Paladin');
-  }
+  // buy your own people back before anything else
+  if(p.intrigues.includes('Rescue a Noble') && anyCaptivesOf(p.i) && eager(.85))
+    await playIntrigue(p,'Rescue a Noble');
   if(G.over) return;
   // knowing our own worth helps at any time, so this one is not held back
   if(p.intrigues.includes('Eye of the Jester') && p.knownStatus===null && Math.random()<.7)
@@ -3453,8 +3913,9 @@ async function aiTurn(p){
   if(G.over) return;
 
   // cut down the leader's stack rather than any old Noble
+  // a removal only costs them the tempo of seating again, so spend it late
   if(p.intrigues.includes('Defenestrate') && threat0 && canRemoveFrom(threat0.fid)
-     && threat0.fid!==p.faction && eager(.75)){
+     && threat0.fid!==p.faction && eager(.55)){
     p._from=threat0.fid; await playIntrigue(p,'Defenestrate');
   }
   if(G.over) return;
@@ -3463,13 +3924,13 @@ async function aiTurn(p){
     await playIntrigue(p,'Oath of Fidelity');
   if(G.over) return;
 
-  // take a Noble off the leader and put them behind our own faction
-  if(p.intrigues.includes('Oathbreaker') && G.nobles[p.faction]<coupAt()-1){
-    const donor = (threat0 && threat0.fid!==p.faction && canRemoveFrom(threat0.fid))
+  // Supplant: take a Noble off the leader and put one of ours behind our faction
+  if(p.intrigues.includes('Supplant') && p.reserve>0 && G.nobles[p.faction]<coupAt()-1){
+    const donor = (threat0 && threat0.fid!==p.faction && rivalNoblesIn(p,threat0.fid)>0)
       ? threat0.fid
-      : ((FACTIONS.filter(f=>f.id!==p.faction && canRemoveFrom(f.id))
+      : ((FACTIONS.filter(f=>f.id!==p.faction && rivalNoblesIn(p,f.id)>0)
                   .sort((a,b)=>G.nobles[b.id]-G.nobles[a.id])[0])||{}).id;
-    if(donor && eager(.8)){ p._from=donor; p._to=p.faction; await playIntrigue(p,'Oathbreaker'); }
+    if(donor && eager(.8)){ p._from=donor; p._to=p.faction; await playIntrigue(p,'Supplant'); }
   }
   if(G.over) return;
   if(p.intrigues.includes('Hidden Archive') && G.intrigueDiscard.length && p.intrigues.length<=2
@@ -3477,15 +3938,30 @@ async function aiTurn(p){
     await playIntrigue(p,'Hidden Archive');
   if(G.over) return;
 
+  // getting your own people back is worth a card once a Call is in reach
+  if(EXPANSION && p.hand.includes(4) && anyCaptivesOf(p.i) && Math.random() < (aiPressure()>=.8?.6:.2)){
+    p.hand.splice(p.hand.indexOf(4),1); p.discard.push(4);
+    log(`${fmtP(p)} spends a <b>4</b> on its favour.`);
+    renderHUD();
+    await ACTIONS.rescueOne(p);
+    if(!p.hand.length){ p.hand.push(...p.discard.splice(0)); p.hand.sort((a,b)=>a-b); }
+    renderHUD(); await wait(420);
+    return;
+  }
+  if(G.over) return;
+
   // a low card is worth more as interference than as two paces
   const threat=aiTopThreat(p);
-  if(threat && anyRemovable()){
+  if(EXPANSION && threat && anyRemovable()){
     const urgent = threat.danger>=3;
     let spend=null;
-    // Raid removes, Exile only relocates \u2014 so reach for the 3 when it is serious
-    if(urgent && p.hand.includes(3) && Math.random()<.5) spend=3;
-    else if(p.hand.includes(2) && Math.random() < (urgent?.55:.14)) spend=2;
-    else if(p.hand.includes(3) && Math.random() < (urgent?.3:.08)) spend=3;
+    /* Nothing is ever destroyed, so weigh the three by how long they set a rival
+       back: Capture holds a Noble out of play until it is rescued, Exile only
+       moves one to another court, and a removal returns it to their muster at
+       once. Capture is therefore the heaviest blow and is reached for first. */
+    if(urgent && p.hand.includes(2) && anyRivalNoble(p) && Math.random()<.7) spend=2;
+    else if(p.hand.includes(3) && Math.random() < (urgent?.35:.1)) spend=3;
+    else if(p.hand.includes(2) && anyRivalNoble(p) && Math.random() < (urgent?.45:.12)) spend=2;
     if(spend){
       p.hand.splice(p.hand.indexOf(spend),1); p.discard.push(spend);
       log(`${fmtP(p)} spends a <b>${spend}</b> on its favour.`);
@@ -3575,6 +4051,14 @@ const WHEN_LABEL = {
 /* The reference sheets describe the game actually being played. */
 function syncSheets(){
   document.querySelectorAll('#rulebook .expo').forEach(el=>{ el.style.display = EXPANSION? '' : 'none'; });
+  const ro=$('#rbobj');
+  if(ro) ro.innerHTML = EXPANSION
+    ? 'Move up the 4 paths of the kingdom and gain support for the faction you secretly back. '+
+      'When a quorum of support is reached, you may Call for the Throne for your faction. '+
+      'The highest Status among their supporters becomes the Heir&rsquo;s Paladin, winning the game.'
+    : 'Move up the 3 paths of the kingdom and gain support for the faction you secretly back. '+
+      'When a quorum of support is reached, you may Call for the Throne for your faction. '+
+      'The highest Status among their supporters wins the game.';
   const wp=$('#winpara');
   if(wp) wp.innerHTML = EXPANSION
     ? 'Everyone turns their cards face up. The faction called for is proclaimed <b>Heir</b>. Each supporter counts their Status, <b>+1 for the arrow</b> if they hold it, and <b>+1 for every Noble of theirs seated with that faction</b>. <b>The highest total becomes the Heir&rsquo;s Paladin, and wins the game.</b>'
@@ -3583,7 +4067,7 @@ function syncSheets(){
   if(box){
     box.innerHTML='';
     const order=['card','own','any','completion','intrigue'];
-    const live=Object.entries(INTRIGUE_DEFS).filter(([k])=>EXPANSION || k!=='Unseat the Paladin');
+    const live=Object.entries(INTRIGUE_DEFS).filter(([k])=>EXPANSION || k!=='Rescue a Noble');
     live.sort((a,b)=>order.indexOf(a[1].when)-order.indexOf(b[1].when))
       .forEach(([name,def])=>{
         const row=document.createElement('div');
@@ -3655,10 +4139,13 @@ function syncLegendTips(){
 }
 syncLegendTips();
 
-let chosenN=4, chosenQ=5, chosenX=true;
+/* A quorum is always 5 Nobles, and the coup always two beyond it. With six
+   Nobles to a player, anything higher cannot reliably be reached. */
+const QUORUM = 5;
+let chosenN=4, chosenX=true;
 
 function showScreen(id){
-  ['s1','s2','s3'].forEach(s=>{ $('#'+s).style.display = (s===id)? 'block':'none'; });
+  ['s1','s3'].forEach(s=>{ $('#'+s).style.display = (s===id)? 'block':'none'; });
 }
 function pressGroup(sel, attr, setter){
   document.querySelectorAll(sel+' .btn').forEach(b=>{
@@ -3677,30 +4164,32 @@ function applyMode(){
   document.querySelectorAll('#s1 .expo').forEach(el=>{ el.style.display = chosenX? '' : 'none'; });
   const obj=$('#objtext');
   if(obj) obj.innerHTML = chosenX
-    ? 'Move up the 4 paths of the kingdom and seat Nobles in your own colour behind the faction you secretly back. '+
+    ? 'Move up the 4 paths of the kingdom and gain support for the faction you secretly back. '+
       'When a quorum of support is reached, you may Call for the Throne for your faction. '+
       'The highest Status among their supporters becomes the Heir&rsquo;s Paladin, winning the game.'
-    : 'Move up the 3 paths of the kingdom and gather Nobles behind the faction you secretly back. '+
+    : 'Move up the 3 paths of the kingdom and gain support for the faction you secretly back. '+
       'When a quorum of support is reached, you may Call for the Throne for your faction. '+
       'The highest Status among their supporters wins the game.';
+  const tp=$('#turnpow');
+  if(tp) tp.innerHTML = chosenX
+    ? '<b class="inl">1</b> moves one and also earns an Intrigue card. '+
+      '<b class="inl">2</b> may be played for movement OR <i>Capture</i> &mdash; take a rival&rsquo;s Noble off the board and hold them hostage. '+
+      '<b class="inl">3</b> may be played for movement OR <i>Exile</i> &mdash; move a Noble to another faction. '+
+      '<b class="inl">4</b> may be played for movement OR <i>Rescue</i> &mdash; return a captive Noble; its captor receives '+
+      'an Intrigue card or advances an Emissary two spaces. '+
+      '<b class="inl">5&ndash;6</b> are played for movement only.'
+    : '<b class="inl">1</b> moves one and also earns an Intrigue card. '+
+      '<b class="inl">2&ndash;6</b> are played for movement only.';
   const pathHead=$('#pathhead');
   if(pathHead) pathHead.textContent = chosenX? 'THE FIRST THREE PATHS' : 'THE THREE PATHS';
 }
 applyMode();
-pressGroup('#qcount','q',v=>{chosenQ=v; drawCoup();});
-function drawCoup(){
-  $('#coupshow').innerHTML=`Quorum <b style="color:var(--ink)">${chosenQ}</b> &nbsp;·&nbsp; Coup at <b>${chosenQ+2}</b>`;
-}
-drawCoup();
 
-$('#begin').onclick=()=>{ showScreen('s2'); };
-$('#backto1').onclick=()=>{ showScreen('s1'); };
 
-$('#toroll').onclick=()=>{
-  newGame(chosenN, chosenQ, chosenX);
-  renderRollCall();
-  showScreen('s3');
-};
+$('#begin').onclick=()=>{ newGame(chosenN, QUORUM, chosenX); renderRollCall(); showScreen('s3'); };
+
+
+
 
 /* The roll call shows the table exactly as you see it from your chair: every
    rival's Status is face-on to you, and your own card is the one turned away. */
@@ -3708,7 +4197,7 @@ function renderRollCall(){
   const n=G.players.length;
   const order=[]; for(let k=0;k<n;k++) order.push(G.players[(G.turn+k)%n]);
   $('#rolllede').innerHTML =
-    `Quorum <b>${quorum()}</b> · coup at <b>${coupAt()}</b>. `+
+    `Quorum <b>${quorum()}</b> · coup at <b>${coupAt()}</b> · <b>${NOBLES_EACH}</b> Nobles each. `+
     `${order[0].isHuman?'You speak':order[0].name+' speaks'} first, and play passes clockwise.`;
   const box=$('#rollrows'); box.innerHTML='';
   order.forEach((p,k)=>{
