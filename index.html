@@ -419,10 +419,10 @@ canvas{display:block;}
 #dtop .eyebrow{font-size:9px; letter-spacing:.16em; padding-bottom:2px; margin-left:auto;}
 
 /* House + status: the same cards, half as tall, sitting over the Honor row */
-.bigcard{width:58px; height:44px; border-radius:5px; border:1px solid #6b5a38; box-shadow:0 3px 8px rgba(0,0,0,.4);
+.bigcard{width:62px; height:44px; border-radius:5px; border:1px solid #6b5a38; box-shadow:0 3px 8px rgba(0,0,0,.4);
   display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:var(--disp); font-weight:900; position:relative;}
 .bigcard .lbl{font-size:6.5px; letter-spacing:.13em; opacity:.85; font-weight:700;}
-.bigcard.faction{color:#f7ead9; font-size:7.5px; text-align:center; line-height:1.15; padding:3px;}
+.bigcard.faction{color:#f7ead9; font-size:7.5px; text-align:center; line-height:1.15; padding:3px 2px;}
 .bigcard.status{background:#f5eed9; color:var(--ink); font-size:22px;}
 .bigcard.back{background:repeating-linear-gradient(45deg,#7a2d20 0 7px,#8e3a2b 7px 14px); color:#f0d9a8; font-size:19px; line-height:1;}
 .bigcard .heirpip{position:absolute; bottom:2px; right:4px; font-size:9px; color:var(--brass); font-weight:900;}
@@ -671,7 +671,7 @@ canvas{display:block;}
   #dock{gap:8px; padding:9px 10px; width:632px;}
   #dockleft{flex:0 0 366px;}
   .honor{width:54px; height:48px; font-size:23px;}
-  .bigcard{width:56px; height:44px;} .bigcard.status{font-size:21px;} .bigcard.faction{font-size:7.5px;}
+  .bigcard{width:60px; height:44px;} .bigcard.status{font-size:21px;} .bigcard.faction{font-size:7.2px;}
   .emistok{width:40px;}
   #intrcol{flex:0 0 128px;} #dockbtns{flex:0 0 100px;}
 }
@@ -821,7 +821,7 @@ canvas{display:block;}
 <div id="dock" class="panel" style="display:none">
   <div id="dockleft">
     <div id="dtop">
-      <div class="bigcard House" id="myfaction"></div>
+      <div class="bigcard faction" id="myfaction"></div>
       <div class="bigcard back" id="mystatus">?</div>
       <div id="emisdock"></div>
       <div id="muster" title="Your Nobles"><div id="musterpips"></div><span class="mlabel">Nobles</span></div>
