@@ -898,9 +898,7 @@ canvas{display:block;}
 
   <h3>OBJECTIVE</h3>
   <p id="rbobj"></p>
-  <p>Each player musters <b>6 Nobles</b> for the whole game and never gains or loses any. Every Noble you seat comes out of that six,
-  and any removed from the board returns to your reserve to be seated again.<span class="expo"> A <b>Captured</b> Noble is the exception:
-  they are held by their captor, out of play and scoring nothing, until a <b>Rescue</b> returns them to your reserve.</span></p>
+  <p id="rbnobles"></p>
   <p>You hold one <b>Faction</b> card and only you can read it. You also hold a <b>Status</b> card, 1 to 9, standing face outward — every rival reads it, and you cannot. So you know whose side you are on, but not whether you are worth enough to lead it.</p>
 
   <h3>YOUR TURN</h3>
@@ -915,12 +913,9 @@ canvas{display:block;}
   <h3>THE PATHS</h3>
   <div id="rbpaths"></div>
   <ul>
-    <li><span class="pathname" style="color:var(--charles)">ARMY</span> &mdash; six steps, allegiance. Under <b>Counsel</b>:
-    choose your faction (look through the deck, take the card you want, then shuffle), swap Faction cards with a rival, force a
-    rival to discard and redraw blind, or secretly read a rival's card. You may steer only your own allegiance &mdash; a rival can
-    only ever be made to redraw at random.</li>
+    <li><span class="pathname" style="color:var(--charles)">ARMY</span> &mdash; six steps, allegiance. <span id="rbarmy"></span></li>
     <li><span class="pathname" style="color:var(--louis)">CHURCH</span> — six steps, status. Swap your Status with a rival, discard and draw blind, force a rival to draw, or look at your own.</li>
-    <li><span class="pathname" style="color:var(--italy)">MARKET</span> — six steps, nobles. <b>Purge:</b> remove 2 Nobles from the board. <b>Bribe:</b> return a rival&rsquo;s seated Noble to their reserve, then seat one Noble from your own reserve with another faction. You cannot Bribe if your reserve is empty.</li>
+    <li><span class="pathname" style="color:var(--italy)">MARKET</span> — six steps, nobles. <span id="rbmarket"></span></li>
     <li class="expo"><span class="pathname" style="color:var(--brass)">THE HEIR’S PALADIN</span> — eight steps, and it pays no path action. Completing it turns the brass arrow to you, or forces a <b>Trial by Combat</b> if another player already holds it.</li>
   </ul>
 
@@ -958,7 +953,7 @@ canvas{display:block;}
 
 
   <h3>WHAT TO WATCH</h3>
-  <p>You can read every Status but your own, and each rival can read yours. Calling for your faction is a wager on a number you have never seen — you may be handing the Paladinate to someone sitting quietly on a 9. You <i>can</i> count your own Nobles, though — that is the part of your score you control, and the part every rival can see coming. Stack them behind one faction and the table learns whose side you are on; a rival who works it out can Purge it in a single action.</p>
+  <p id="rbwatch"></p>
 </div></div>
 
 <div id="banner"></div>
@@ -1124,11 +1119,12 @@ const INTRIGUE_DEFS = {
   'Rescue a Noble':       {n:2, when:'own',        d:'\u27a4 Return a captive Noble. Its captor receives an Intrigue card or advances an Emissary two spaces.'},
   'Hidden Archive':    {n:2, when:'own',        d:'Search the Intrigue discards and take one.'},
   'Eye of the Jester': {n:2, when:'any',        d:'Look at your own Status.'},
-  'Supplant':             {n:2, when:'any',        d:'Return a rival\u2019s seated Noble to its owner\u2019s reserve, then seat one Noble from your reserve with a different faction. You cannot Supplant if your reserve is empty.'},
+  'Supplant':             {n:2, when:'any',        d:'Return a rival\u2019s seated Noble to its owner\u2019s reserve, then seat one Noble from your reserve with a different faction. You cannot Supplant if your reserve is empty.',
+                                                     db:'Move a Noble to another faction.'},
   'Defenestrate':      {n:2, when:'any',        d:'Remove a Noble from the board.'},
   'Oath of Fidelity':  {n:2, when:'any',        d:'Seat a Noble with a faction.'},
   'Plague':            {n:2, when:'completion', d:'Skip seating a Noble. Play at anyone\u2019s completion.'},
-  'Breach of Order':   {n:4, when:'intrigue',   d:'Cancel an Intrigue. Removed from the game once used.'},
+  'Breach of Order':   {n:4, when:'intrigue',   d:'Cancel the Intrigue just played, including another Breach \u2014 in which case the first card resolves after all. Removed from the game once used.'},
 };
 /* Card text differs between the games: Throne has no Noble ownership. */
 function iDesc(name){ const d=INTRIGUE_DEFS[name]; return (!EXPANSION && d.db) ? d.db : d.d; }
@@ -4351,7 +4347,29 @@ const WHEN_LABEL = {
 /* The reference sheets describe the game actually being played. */
 function syncSheets(){
   document.querySelectorAll('#rulebook .expo').forEach(el=>{ el.style.display = EXPANSION? '' : 'none'; });
-  { const rp=$('#rbpaths');
+  { const nb=$('#rbnobles'); if(nb) nb.innerHTML = noblesText(EXPANSION);
+    const ar=$('#rbarmy'); if(ar) ar.innerHTML = EXPANSION
+      ? 'Under <b>Counsel</b>: choose your faction (look through the deck, take the card you want, then shuffle), '+
+        'swap Faction cards with a rival, force a rival to discard and redraw blind, or secretly read a rival’s card. '+
+        'You may steer only your own allegiance — a rival can only ever be made to redraw at random.'
+      : 'Choose your faction (look through the deck, take the card you want, then shuffle), swap Faction cards with a '+
+        'rival, force a rival to discard and redraw blind, or secretly read a rival’s card. You may steer only your '+
+        'own allegiance — a rival can only ever be made to redraw at random.';
+    const mk=$('#rbmarket'); if(mk) mk.innerHTML = EXPANSION
+      ? '<b>Purge:</b> remove 2 Nobles from the board. <b>Bribe:</b> return a rival’s seated Noble to their reserve, '+
+        'then seat one Noble from your own reserve with another faction. You cannot Bribe if your reserve is empty.'
+      : '<b>Purge:</b> remove 2 Nobles from the board. <b>Bribe:</b> move a Noble to another faction.';
+    const wt=$('#rbwatch'); if(wt) wt.innerHTML = EXPANSION
+      ? 'You can read every Status but your own, and each rival can read yours. Calling for your faction is a wager on a '+
+        'number you have never seen — you may be handing the Paladinate to someone sitting quietly on a 9. You <i>can</i> '+
+        'count your own Nobles, though — that is the part of your score you control, and the part every rival can see '+
+        'coming. Stack them behind one faction and the table learns whose side you are on; a rival who works it out can '+
+        'Purge it in a single action.'
+      : 'You can read every Status but your own, and each rival can read yours. Calling for your faction is a wager on a '+
+        'number you have never seen — you may be handing the throne to someone sitting quietly on a 9. Nobles do not '+
+        'score here: they only decide <i>which</i> faction can be Called. So watch the counts, and watch who keeps steering '+
+        'them — a faction pushed to quorum is a faction someone believes they can win.';
+    const rp=$('#rbpaths');
     if(rp) rp.innerHTML = EXPANSION
       ? '<p>When you complete a path you <b>must</b> place one Noble from your reserve if able. '+
         '<b>You do not choose where it goes:</b> flip the top card of the Faction deck, seat the Noble '+
